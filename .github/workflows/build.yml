@@ -3,8 +3,36 @@ name: Docker Flask Celery Redis
 on: [push]
 
 jobs:
-  build:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@master
 
+      - name: 'Login via Azure CLI'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+#      - uses: azure/docker-login@v1
+#        with:
+#          login-server: newstorycontainerregistry.azurecr.io
+#          username: ${{ secrets.REGISTRY_USERNAME }}
+#          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - run: |
+          docker build api -t newstorycontainerregistry.azurecr.io/api:${{ github.sha }}
+          docker push newstorycontainerregistry.azurecr.io/api:${{ github.sha }}
+
+#      - uses: azure/webapps-container-deploy@v1
+#        with:
+#          app-name: 'node-rnc'
+#          images: 'contoso.azurecr.io/nodejssampleapp:${{ github.sha }}'
+
+      - name: Azure logout
+        run: |
+          az logout
+  build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
