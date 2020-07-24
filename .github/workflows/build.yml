@@ -14,11 +14,11 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-#      - uses: azure/docker-login@v1
-#        with:
-#          login-server: newstorycontainerregistry.azurecr.io
-#          username: ${{ secrets.REGISTRY_USERNAME }}
-#          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - uses: azure/docker-login@v1
+        with:
+          login-server: newstorycontainerregistry.azurecr.io
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
           docker build api -t newstorycontainerregistry.azurecr.io/api:${{ github.sha }}
