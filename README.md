@@ -27,9 +27,9 @@ To shut down:
 docker-compose down
 ```
 
-To change the endpoints, update the code in [api/app.py](api/app.py)
+To change the endpoints, update the code in [api/app.py](api/src/app.py)
 
-Task changes should happen in [queue/tasks.py](celery-queue/tasks.py) 
+Task changes should happen in [queue/tasks.py](celery-queue/src/tasks.py) 
 
 ---
 

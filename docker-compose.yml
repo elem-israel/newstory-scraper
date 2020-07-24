@@ -10,6 +10,9 @@ services:
     depends_on:
       - redis
   worker:
+    environment:
+      - USER
+      - PASSWORD
     build:
       context: celery-queue
       dockerfile: Dockerfile
