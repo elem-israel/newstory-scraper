@@ -26,14 +26,10 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
-          docker build api -t newstorycontainerregistry.azurecr.io/api:${{ github.sha }}
-          docker push newstorycontainerregistry.azurecr.io/api:${{ github.sha }}
           docker build api -t newstorycontainerregistry.azurecr.io/api:latest
           docker push newstorycontainerregistry.azurecr.io/api:latest
 
       - run: |
-          docker build celery-queue -t newstorycontainerregistry.azurecr.io/celery-queue:${{ github.sha }}
-          docker push newstorycontainerregistry.azurecr.io/celery-queue:${{ github.sha }}
           docker build celery-queue -t newstorycontainerregistry.azurecr.io/celery-queue:latest
           docker push newstorycontainerregistry.azurecr.io/celery-queue:latest
 
