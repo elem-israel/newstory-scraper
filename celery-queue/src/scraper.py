@@ -3,8 +3,7 @@ import json
 import logging
 import os
 import sys
-
-import instagram_scraper
+from instagram_scraper import InstagramScraper
 from instapy import InstaPy, smart_run
 
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -28,19 +27,15 @@ def scrape(user: str, login_user: str, login_password: str):
     followers_path = os.path.join(outdir, "followers.json")
     if not os.path.exists(profile_path):
         log.info("running instagram scraper")
-        sys.argv = [
-            "",
-            user,
-            "--media-type",
-            "none",
-            "-m",
-            "100",
-            "--profile-metadata",
-            "--destination",
-            "temp",
-            "--media-metadata",
-        ]
-        instagram_scraper.app.main()
+        scraper = InstagramScraper(
+            usernames=[user],
+            destination="temp",
+            media_metadata=True,
+            profile_metadata=True,
+            media_types=[],
+            maximum=10,
+        )
+        scraper.scrape()
     with open("temp/{u}.json".format(u=user), encoding="utf8") as scraped:
         profile = json.load(scraped)
         dump_json(profile, profile_path)
@@ -60,4 +55,7 @@ def scrape(user: str, login_user: str, login_password: str):
 
 
 if __name__ == "__main__":
+    from dotenv import load_dotenv
+
+    load_dotenv()
     scrape("popeye", os.environ["USER"], os.environ["PASSWORD"])
