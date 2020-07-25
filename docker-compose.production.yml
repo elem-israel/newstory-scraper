@@ -2,21 +2,21 @@ version: "3"
 
 services:
   web:
-    image: newstorycontainerregistry.azurecr.io/api:v1
+    image: newstorycontainerregistry.azurecr.io/api:latest
     restart: always
     ports:
       - "5001:5001"
     depends_on:
       - redis
   worker:
-    image: newstorycontainerregistry.azurecr.io/celery-queue:v1
+    image: newstorycontainerregistry.azurecr.io/celery-queue:latest
     environment:
       - USER
       - PASSWORD
     depends_on:
       - redis
   monitor:
-    image: newstorycontainerregistry.azurecr.io/celery-queue:v1
+    image: newstorycontainerregistry.azurecr.io/celery-queue:latest
     ports:
       - "5555:5555"
     entrypoint: flower
