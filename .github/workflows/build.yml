@@ -25,7 +25,7 @@ jobs:
           docker push newstorycontainerregistry.azurecr.io/api:${{ github.sha }}
 
       - run: |
-          docker build api -t newstorycontainerregistry.azurecr.io/celery-queue:${{ github.sha }}
+          docker build celery-queue -t newstorycontainerregistry.azurecr.io/celery-queue:${{ github.sha }}
           docker push newstorycontainerregistry.azurecr.io/celery-queue:${{ github.sha }}
 
       - name: Azure logout
