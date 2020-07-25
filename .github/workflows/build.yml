@@ -24,10 +24,9 @@ jobs:
           docker build api -t newstorycontainerregistry.azurecr.io/api:${{ github.sha }}
           docker push newstorycontainerregistry.azurecr.io/api:${{ github.sha }}
 
-#      - uses: azure/webapps-container-deploy@v1
-#        with:
-#          app-name: 'node-rnc'
-#          images: 'contoso.azurecr.io/nodejssampleapp:${{ github.sha }}'
+      - run: |
+          docker build api -t newstorycontainerregistry.azurecr.io/celery-queue:${{ github.sha }}
+          docker push newstorycontainerregistry.azurecr.io/celery-queue:${{ github.sha }}
 
       - name: Azure logout
         run: |
