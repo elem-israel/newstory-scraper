@@ -25,3 +25,5 @@ services:
       - redis
   redis:
     image: redis
+    volumes:
+    - ./redis_data:/data
