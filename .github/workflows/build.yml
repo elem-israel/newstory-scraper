@@ -1,6 +1,9 @@
 name: Docker Flask Celery Redis
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build-and-deploy:
