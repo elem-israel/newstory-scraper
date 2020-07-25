@@ -6,6 +6,11 @@ import celery.states as states
 app = Flask(__name__)
 
 
+@app.route("/hello")
+def hello() -> str:
+    return "world"
+
+
 @app.route("/add/<int:param1>/<int:param2>")
 def add(param1: int, param2: int) -> str:
     task = celery.send_task("tasks.add", args=[param1, param2], kwargs={})
