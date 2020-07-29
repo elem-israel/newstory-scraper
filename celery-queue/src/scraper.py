@@ -33,6 +33,7 @@ def get_profile(user: str, login_user: str, login_password: str, path: str):
         media_metadata=True,
         profile_metadata=True,
         media_types=["none"],
+        include_location=True
     )
     scraper.scrape()
     with open(f"temp/{user}.json", encoding="utf8") as scraped:
@@ -65,5 +66,5 @@ def scrape(user: str, login_user: str, login_password: str, out_dir: str = "outp
     relations_path = os.path.join(out_path, "relations.json")
     if not os.path.exists(profile_path):
         get_profile(user, login_user, login_password, profile_path)
-    if not os.path.exists(relations_path):
-        get_relations(user, login_user, login_password, relations_path)
+    # if not os.path.exists(relations_path):
+    #     get_relations(user, login_user, login_password, relations_path)
