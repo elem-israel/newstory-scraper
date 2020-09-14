@@ -2,16 +2,9 @@ from datetime import datetime
 import json
 import logging
 import os
-import sys
-from instagram_scraper import InstagramScraper
-from instapy import InstaPy, smart_run
 
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-logging.getLogger().setLevel(logging.INFO)
-handler = logging.StreamHandler(sys.stdout)
-handler.setLevel(logging.INFO)
-handler.setFormatter(formatter)
-logging.getLogger().addHandler(handler)
+from instagram_scraper import InstagramScraper
+
 log = logging.getLogger(__name__)
 
 
@@ -25,7 +18,7 @@ def dump_json(obj, dest):
         )
 
 
-def get_profile(user: str, login_user: str, login_password: str, path: str):
+def get_profile(user: str):
     log.info("running instagram scraper")
     scraper = InstagramScraper(
         usernames=[user],
@@ -33,12 +26,13 @@ def get_profile(user: str, login_user: str, login_password: str, path: str):
         media_metadata=True,
         profile_metadata=True,
         media_types=["none"],
-        include_location=True
+        # include_location=True,
+        comments=True,
+        maximum=100,
     )
     scraper.scrape()
     with open(f"temp/{user}.json", encoding="utf8") as scraped:
         res = json.load(scraped)
-        dump_json(res, path)
     return res
 
 
@@ -59,12 +53,10 @@ def get_relations(user: str, login_user: str, login_password: str, path: str):
     return
 
 
-def scrape(user: str, login_user: str, login_password: str, out_dir: str = "output"):
+def scrape_profile(user: str, out_dir):
     out_path = os.path.join(out_dir, user)
     os.makedirs(out_path, exist_ok=True)
     profile_path = os.path.join(out_path, "profile.json")
-    relations_path = os.path.join(out_path, "relations.json")
-    if not os.path.exists(profile_path):
-        get_profile(user, login_user, login_password, profile_path)
-    # if not os.path.exists(relations_path):
-    #     get_relations(user, login_user, login_password, relations_path)
+    res = get_profile(user)
+    with open(profile_path, "w") as fp:
+        json.dump(res, fp)

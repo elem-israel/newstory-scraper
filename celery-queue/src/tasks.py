@@ -1,7 +1,7 @@
 import os
 import time
 from celery import Celery
-from scraper import scrape as scraper
+from scraper import scrape_profile as scraper
 
 
 CELERY_BROKER_URL = (os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379"),)
