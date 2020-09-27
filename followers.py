@@ -42,9 +42,9 @@ def main(users, input_file, out_dir, max_followers, cloud):
     if users:
         users_list = users.split(",")
     elif input_file:
-        users_list = input_file.read().split("\n")
+        users_list = [u for u in input_file.read().split("\n") if not u.startswith("#")]
     else:
-        raise Exception("inout_file or users must be provided")
+        raise Exception("file or users must be provided")
     session = InstaPy(
         username=os.environ["INSTAPY_USER"],
         password=os.environ["INSTAPY_PASSWORD"],
@@ -55,7 +55,7 @@ def main(users, input_file, out_dir, max_followers, cloud):
             print(f"processing {u}")
             user_dir = os.path.join(out_dir, u)
             user_path = os.path.join(user_dir, "relations.json")
-            relations = get_relations(session, u, max_followers=max_followers,)
+            relations = get_relations(session, u, max_followers=max_followers)
             os.makedirs(user_dir, exist_ok=True)
             with open(user_path, "w") as fp:
                 json.dump(
