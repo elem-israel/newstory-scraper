@@ -23,10 +23,7 @@ def get_relations(
     res = {}
     if followers:
         res["followers"] = session.grab_followers(
-            username=user,
-            amount=max_followers,
-            live_match=False,
-            store_locally=True,
+            username=user, amount=max_followers, live_match=False, store_locally=True,
         )
     if following:
         res["following"] = session.grab_following(
@@ -39,10 +36,9 @@ def get_relations(
 @click.argument("users", required=False)
 @click.option("--file", "input_file", type=click.File("r"))
 @click.option("--out", "out_dir", type=click.Path(), default="output")
-@click.option("--workspace", type=click.Path())
 @click.option("--max-followers", type=int)
 @click.option("--cloud", type=bool)
-def main(users, input_file, out_dir, max_followers, workspace, cloud):
+def main(users, input_file, out_dir, max_followers, cloud):
     if users:
         users_list = users.split(",")
     elif input_file:
