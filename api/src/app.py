@@ -20,7 +20,7 @@ def add(param1: int, param2: int) -> str:
 
 @app.route("/scrape/<user>")
 def scrape(user: str) -> str:
-    task = celery.send_task("tasks.scrape", args=[user], kwargs={})
+    task = celery.send_task("tasks.profile", args=[user], kwargs={})
     response = f"<a href='{url_for('check_task', task_id=task.id, external=True)}'>check status of {task.id} </a>"
     return response
 
