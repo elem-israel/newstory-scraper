@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-     - "5001:5001"
+      - "5001:5001"
     depends_on:
       - redis
   worker:
@@ -16,6 +16,8 @@ services:
     build:
       context: celery-queue
       dockerfile: Dockerfile
+    volumes:
+      - artifacts:/tmp/artifacts
     depends_on:
       - redis
   monitor:
@@ -23,10 +25,12 @@ services:
       context: celery-queue
       dockerfile: Dockerfile
     ports:
-     - "5555:5555"
+      - "5555:5555"
     entrypoint: flower
     command:  -A tasks --port=5555 --broker=redis://redis:6379/0
     depends_on:
       - redis
   redis:
     image: redis
+volumes:
+  artifacts:

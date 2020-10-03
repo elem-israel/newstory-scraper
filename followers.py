@@ -16,21 +16,6 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-def get_relations(
-    session, user: str, max_followers: int = "full", followers=True, following=False,
-):
-    logger.info("running instapy")
-    res = {}
-    if followers:
-        res["followers"] = session.grab_followers(
-            username=user, amount=max_followers, live_match=False, store_locally=True,
-        )
-    if following:
-        res["following"] = session.grab_following(
-            username=user, amount=100, live_match=True, store_locally=True
-        )
-    return res
-
 
 @click.command()
 @click.argument("users", required=False)
