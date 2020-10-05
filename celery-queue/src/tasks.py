@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 import os
 import time
@@ -22,11 +23,16 @@ def hello(string: str) -> str:
     return string
 
 
-@celery.task(name="tasks.profile", autoretry_for=(HTTPError,), retry_backoff=True)
+@celery.task(
+    name="tasks.profile",
+    autoretry_for=(HTTPError, ValueError),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 5},
+)
 def scrape_profile(user) -> None:
     profile = get_profile(user, "/tmp/scraper")
     profile_path = f"/tmp/profiles/{user}/profile.json"
     os.makedirs(os.path.dirname(profile_path), exist_ok=True)
     with open(profile_path, "w") as fp:
-        json.dump(profile, fp)
+        json.dump({"created_at": datetime.utcnow().isoformat(), "data": profile}, fp)
     return profile

@@ -37,4 +37,4 @@ RUN pip install -r requirements.txt
 
 COPY src /queue
 
-ENTRYPOINT celery -A tasks worker --loglevel=info
+ENTRYPOINT celery -A tasks worker --loglevel=info --concurrency 1
