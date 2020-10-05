@@ -2,6 +2,7 @@ import os
 import time
 
 from celery import Celery
+from requests import HTTPError
 
 from scraper import get_profile
 
@@ -12,6 +13,7 @@ CELERY_RESULT_BACKEND = os.environ.get(
 
 celery = Celery("tasks", broker=CELERY_BROKER_URL, backend=CELERY_RESULT_BACKEND)
 
+print("worker started")
 
 @celery.task(name="tasks.add")
 def add(x: int, y: int) -> int:
@@ -19,6 +21,13 @@ def add(x: int, y: int) -> int:
     return x + y
 
 
-@celery.task(name="tasks.profile")
+@celery.task(name="tasks.hello")
+def hello() -> str:
+    time.sleep(5)
+    print("hello world")
+    return "hello world"
+
+
+@celery.task(name="tasks.profile", autoretry_for=(HTTPError,), retry_backoff=True)
 def profile(user) -> None:
-    return get_profile(user, "./")
+    return get_profile(user, "/tmp/artifacts")

@@ -17,7 +17,7 @@ def get_profile(user: str, destination: str):
         media_metadata=True,
         profile_metadata=True,
         media_types=["none"],
-        maximum=100,
+        maximum=3,
         comments=True,
     )
     scraper.scrape()

@@ -1,0 +1,44 @@
+version: "3"
+services:
+  web:
+    tty: true # Enables debugging capabilities when attached to this container.
+    image: 'docker.io/bitnami/express:4-debian-10'
+    command: npm run dev-docker
+    environment:
+      - PORT=3000
+      - NODE_ENV=development
+      - SKIP_NPM_INSTALL=0
+      - VAR=2
+      - CELERY_BROKER_URL=redis://redis:6379
+      - CELERY_RESULT_BACKEND=redis://redis:6379
+    ports:
+      - 3000:3000
+    volumes:
+      - ./web:/app
+    depends_on:
+      - redis
+  worker:
+    environment:
+      - USER
+      - PASSWORD
+      - CELERY_BROKER_URL=redis://redis:6379
+      - CELERY_RESULT_BACKEND=redis://redis:6379
+    build:
+      context: celery-queue
+      dockerfile: Dockerfile
+    volumes:
+      - C:/tmp/artifacts:/tmp/artifacts
+    depends_on:
+      - redis
+  monitor:
+    build:
+      context: ./celery-queue
+      dockerfile: Dockerfile
+    ports:
+      - "5555:5555"
+    entrypoint: flower
+    command:  -A tasks --port=5555 --broker=redis://redis:6379/0
+    depends_on:
+      - redis
+  redis:
+    image: redis
