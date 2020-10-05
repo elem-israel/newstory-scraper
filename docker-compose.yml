@@ -27,7 +27,7 @@ services:
       context: celery-queue
       dockerfile: Dockerfile
     volumes:
-      - C:/tmp/artifacts:/tmp/artifacts
+      - D:/tmp/newstory/profiles:/tmp/profiles
     depends_on:
       - redis
   monitor:

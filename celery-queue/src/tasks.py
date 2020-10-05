@@ -1,3 +1,4 @@
+import json
 import os
 import time
 
@@ -13,21 +14,19 @@ CELERY_RESULT_BACKEND = os.environ.get(
 
 celery = Celery("tasks", broker=CELERY_BROKER_URL, backend=CELERY_RESULT_BACKEND)
 
-print("worker started")
 
-@celery.task(name="tasks.add")
-def add(x: int, y: int) -> int:
+@celery.task(name="tasks.echo")
+def hello(string: str) -> str:
     time.sleep(5)
-    return x + y
-
-
-@celery.task(name="tasks.hello")
-def hello() -> str:
-    time.sleep(5)
-    print("hello world")
-    return "hello world"
+    print(string)
+    return string
 
 
 @celery.task(name="tasks.profile", autoretry_for=(HTTPError,), retry_backoff=True)
-def profile(user) -> None:
-    return get_profile(user, "/tmp/artifacts")
+def scrape_profile(user) -> None:
+    profile = get_profile(user, "/tmp/scraper")
+    profile_path = f"/tmp/profiles/{user}/profile.json"
+    os.makedirs(os.path.dirname(profile_path), exist_ok=True)
+    with open(profile_path, "w") as fp:
+        json.dump(profile, fp)
+    return profile
