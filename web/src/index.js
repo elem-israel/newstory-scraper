@@ -9,8 +9,6 @@ const client = celery.createClient(
   process.env.CELERY_RESULT_BACKEND
 );
 
-client.conf.TASK_PROTOCOL = 1;
-
 app.get("/", function (req, res) {
   res.send("Hello World");
 });
