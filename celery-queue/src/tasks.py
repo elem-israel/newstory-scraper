@@ -3,19 +3,11 @@ import json
 import os
 import time
 
-from celery import Celery
+from .app import app
 from requests import HTTPError
 from azure.storage.blob import BlobServiceClient
 
 from scraper import get_profile
-
-CELERY_BROKER_URL = (os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379"),)
-CELERY_RESULT_BACKEND = os.environ.get(
-    "CELERY_RESULT_BACKEND", "redis://localhost:6379"
-)
-
-app = Celery("tasks", broker=CELERY_BROKER_URL, backend=CELERY_RESULT_BACKEND)
-app.conf.update(result_expires=3600)
 
 if os.getenv("WORKER"):
     blob_service_client = BlobServiceClient.from_connection_string(

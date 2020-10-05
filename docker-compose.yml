@@ -11,6 +11,8 @@ services:
       - VAR=2
       - CELERY_BROKER_URL=redis://redis:6379
       - CELERY_RESULT_BACKEND=redis://redis:6379
+      - AZURE_STORAGE_CONNECTION_STRING
+      - CONTAINER_NAME
     ports:
       - 3000:3000
     volumes:
@@ -23,8 +25,11 @@ services:
       - PASSWORD
       - CELERY_BROKER_URL=redis://redis:6379
       - CELERY_RESULT_BACKEND=redis://redis:6379
+      - AZURE_STORAGE_CONNECTION_STRING
+      - CONTAINER_NAME
+      - WORKER=1
     build:
-      context: celery-queue
+      context: ./celery-queue
       dockerfile: Dockerfile
     volumes:
       - D:/tmp/newstory/profiles:/tmp/profiles
@@ -37,7 +42,7 @@ services:
     ports:
       - "5555:5555"
     entrypoint: flower
-    command: -A tasks --port=5555 --broker=redis://redis:6379/0
+    command: -A src --port=5555 --broker=redis://redis:6379/0
     depends_on:
       - redis
   redis:
