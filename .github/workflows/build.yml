@@ -26,8 +26,8 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
-          docker build api -t newstorycontainerregistry.azurecr.io/api:latest
-          docker push newstorycontainerregistry.azurecr.io/api:latest
+          docker build web -t newstorycontainerregistry.azurecr.io/web:latest
+          docker push newstorycontainerregistry.azurecr.io/weblatest
 
       - run: |
           docker build celery-queue -t newstorycontainerregistry.azurecr.io/celery-queue:latest
