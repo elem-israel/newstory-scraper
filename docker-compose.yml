@@ -11,6 +11,7 @@ services:
       - VAR=2
       - CELERY_BROKER_URL=redis://redis:6379
       - CELERY_RESULT_BACKEND=redis://redis:6379
+      - FLOWER_URL=http://monitor:5555
       - AZURE_STORAGE_CONNECTION_STRING
       - CONTAINER_NAME
     ports:
