@@ -1,22 +1,13 @@
-## Dockerfile for building production image
-FROM bitnami/express:4.17.1-debian-10-r225
-LABEL maintainer "John Smith <john.smith@acme.com>"
-
-ENV DISABLE_WELCOME_MESSAGE=1
-
-ENV NODE_ENV=production \
-    PORT=3000
-
-# Skip fetching dependencies and database migrations for production image
-ENV SKIP_DB_WAIT=0 \
-    SKIP_DB_MIGRATION=1 \
-    SKIP_NPM_INSTALL=1 \
-    SKIP_BOWER_INSTALL=1
-
-COPY . /app
-RUN sudo chown -R bitnami: /app
-
+FROM node:12-alpine AS ts-builder
+WORKDIR /app
+COPY package.json /app
 RUN npm install
+COPY . .
+RUN npm run build
 
-EXPOSE 3000
-CMD ["npm", "start"]
+FROM node:12-alpine
+WORKDIR /app
+COPY --from=ts-builder ./app/dist /app/dist
+COPY *.json /app/
+RUN npm install --production
+CMD npm start
