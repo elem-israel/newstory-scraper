@@ -3,7 +3,7 @@ import json
 import os
 import time
 
-from .celery import app
+from . import app
 from requests import HTTPError
 from azure.storage.blob import BlobServiceClient
 
