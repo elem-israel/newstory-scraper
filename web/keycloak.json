@@ -1,0 +1,12 @@
+{
+  "realm": "newstory",
+  "auth-server-url": "http://localhost:8080/auth",
+  "bearerOnly": true,
+  "ssl-required": "external",
+  "resource": "express",
+  "credentials": {
+    "secret": "c58d32a8-cf48-489a-ad40-c28443f398b0"
+  },
+  "confidential-port": 0,
+  "policy-enforcer": {}
+}

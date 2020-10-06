@@ -1,9 +1,15 @@
+require("dotenv").config();
 import { BlobServiceClient } from "@azure/storage-blob";
 import { AsyncResult } from "celery-node/dist/app/result";
 import express, { Request, Response } from "express";
 import * as celery from "celery-node";
 import { v4 } from "uuid";
-import { deepStrictEqual } from "assert";
+import queue from "./routes/queue";
+import auth from "./routes/auth";
+import { installKeycloak, keycloak } from "./keycloak";
+import bodyParser from "body-parser";
+
+const port = process.env.PORT || 3000;
 
 const app = express();
 const blobServiceClient = BlobServiceClient.fromConnectionString(
@@ -73,4 +79,15 @@ app.get("/profile/:username", async function (req: Request, res: Response) {
   return res.send(JSON.parse(downloadBlockBlobResponse));
 });
 
-app.listen(3000, () => console.log("service started"));
+if (
+  process.env.NODE_ENV === "production" ||
+  Number.parseInt(process.env.USE_AUTH)
+) {
+  installKeycloak(app);
+  app.use(keycloak.protect());
+}
+
+app.use(bodyParser.json());
+app.use("/queue", queue);
+app.use("/auth", auth);
+app.listen(port, () => console.log(`server listening on port ${port}`));
