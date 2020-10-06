@@ -36,9 +36,3 @@ jobs:
       - name: Azure logout
         run: |
           az logout
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    - name: Build
-      run: docker-compose up -d
