@@ -1,3 +1,5 @@
+import os
+
 from celery.app import Celery
 
 CELERY_BROKER_URL = (os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379"),)

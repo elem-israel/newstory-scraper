@@ -3,13 +3,13 @@ import json
 import os
 import time
 
-from .app import app
+from .celery import app
 from requests import HTTPError
 from azure.storage.blob import BlobServiceClient
 
-from scraper import get_profile
+from .scraper import get_profile
 
-if os.getenv("WORKER"):
+if int(os.getenv("WORKER", 0)):
     blob_service_client = BlobServiceClient.from_connection_string(
         os.getenv("AZURE_STORAGE_CONNECTION_STRING")
     )
@@ -46,5 +46,5 @@ def upload(user, path) -> str:
         container=container_name, blob=f"profiles/{user}/profile.json"
     )
     with open(path, "rb") as data:
-        blob_client.upload_blob(data)
+        blob_client.upload_blob(data, overwrite=True)
     return "done"

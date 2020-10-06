@@ -25,7 +25,7 @@ def get_profile(user: str, destination: str):
         with open(os.path.join(destination, f"{user}.json"), encoding="utf8") as fp:
             return json.load(fp)
     except FileNotFoundError:
-        raise ValueError("User not found. Maybe private profile?")
+        raise ValueError("Failed to scrape profile not found. View logs for more info.")
 
 
 def get_relations(
