@@ -1,4 +1,3 @@
-require("dotenv").config();
 import { BlobServiceClient } from "@azure/storage-blob";
 import { AsyncResult } from "celery-node/dist/app/result";
 import express, { Request, Response } from "express";
