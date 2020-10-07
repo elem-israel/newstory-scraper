@@ -38,5 +38,6 @@ RUN pip install -r requirements.txt
 COPY src /queue/src
 COPY celeryconfig.py /queue/
 COPY start_flower.sh /queue/
+RUN chmod 755 start_flower.sh
 
 ENTRYPOINT celery -A src worker --loglevel=info -Q * --concurrency 1
