@@ -1,4 +1,5 @@
 import os
+from random import random
 
 from dotenv import load_dotenv
 from azure.storage.blob import BlobServiceClient
@@ -13,6 +14,9 @@ blob_service_client = BlobServiceClient.from_connection_string(
 container_name = os.environ["CONTAINER_NAME"]
 
 
+batch = 500
+
+
 def main():
     with open("D:/tmp/newstory/youth.txt", "r") as fp:
         profiles = fp.readlines()
@@ -25,6 +29,8 @@ def main():
     )
     to_scrape = list(set(profiles) - set(existing))
     assert len(profiles) > len(to_scrape)
+    if len(to_scrape) < batch:
+        sample = random.sample
     for user in to_scrape[:500]:
         print(f"sending {user}")
         res = requests.post(

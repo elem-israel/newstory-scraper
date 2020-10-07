@@ -1,0 +1,1 @@
+flower -A src --port=5555 --broker=$CELERY_BORKER

@@ -20,18 +20,42 @@ services:
       - ./web:/app
     depends_on:
       - redis
-  worker:
+  profile_worker:
     environment:
-      - USER
-      - PASSWORD
       - CELERY_BROKER_URL=redis://redis:6379
       - CELERY_RESULT_BACKEND=redis://redis:6379
       - AZURE_STORAGE_CONNECTION_STRING
       - CONTAINER_NAME
       - WORKER=1
+      - PROXY_USER
+      - PROXY_PASSWORD
+      - PROXY_HOST
+      - PROXY_PORT
     build:
       context: ./celery-queue
       dockerfile: Dockerfile
+    entrypoint: celery
+    command: -A src worker --loglevel=info --concurrency 1 -Q profile
+    volumes:
+      - D:/tmp/newstory/profiles:/tmp/profiles
+    depends_on:
+      - redis
+  upload_worker:
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379
+      - CELERY_RESULT_BACKEND=redis://redis:6379
+      - AZURE_STORAGE_CONNECTION_STRING
+      - CONTAINER_NAME
+      - WORKER=1
+      - PROXY_USER
+      - PROXY_PASSWORD
+      - PROXY_HOST
+      - PROXY_PORT
+    build:
+      context: ./celery-queue
+      dockerfile: Dockerfile
+    entrypoint: celery
+    command: -A src worker --loglevel=info --concurrency 1 -Q upload
     volumes:
       - D:/tmp/newstory/profiles:/tmp/profiles
     depends_on:
@@ -42,8 +66,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5555:5555"
-    entrypoint: flower
-    command: -A src --port=5555 --broker=redis://redis:6379/0
+    environment:
+      - CELERY_BROKER_URL
+    entrypoint: ./start_flower.sh
     depends_on:
       - redis
   redis:
