@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build-and-deploy:
+  build-web-image:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout GitHub Action'
@@ -28,6 +28,29 @@ jobs:
       - run: |
           docker build web -t newstorycontainerregistry.azurecr.io/web:latest
           docker push newstorycontainerregistry.azurecr.io/web:latest
+
+      - name: Azure logout
+        run: |
+          az logout
+
+  build-celery-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@master
+        with:
+          ref: master
+
+      - name: 'Login via Azure CLI'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - uses: azure/docker-login@v1
+        with:
+          login-server: newstorycontainerregistry.azurecr.io
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
           docker build celery-queue -t newstorycontainerregistry.azurecr.io/celery-queue:latest
