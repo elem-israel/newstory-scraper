@@ -30,18 +30,21 @@ def hello(string: str) -> str:
 )
 def scrape_profile(user) -> dict:
     profile = get_profile(user, "/tmp/scraper")
-    profile_path = f"/tmp/profiles/{user}/profile.json"
-    os.makedirs(os.path.dirname(profile_path), exist_ok=True)
-    with open(profile_path, "w") as fp:
+    path = f"/tmp/profiles/{user}/profile.json"
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as fp:
         json.dump({"created_at": datetime.utcnow().isoformat(), "data": profile}, fp)
-    upload.apply_async(args=[user, profile_path])
+    upload.apply_async(args=[path])
     return profile
 
 
 @app.task(name="tasks.upload")
-def upload(user, path) -> str:
+def upload(path) -> str:
     container_name = os.environ["CONTAINER_NAME"]
-    date = datetime.utcnow().isoformat().split("T")[0]
+    with open(path, "r") as fp:
+        profile = json.load(fp)
+    date = datetime.fromisoformat(profile["created_at"]).isoformat().split("T")[0]
+    user = profile["data"]["GraphProfileInfo"]["username"]
     blob = f"profiles/{date}/{user}/profile.json"
     blob_client = blob_service_client.get_blob_client(
         container=container_name, blob=blob
