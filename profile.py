@@ -37,18 +37,21 @@ def main(users, input_file, out_dir):
         if destination is None:
             temp_dir = tempfile.TemporaryDirectory()
             destination = temp_dir.name
-        user_dir = os.path.join(out_dir, u)
-        user_path = os.path.join(user_dir, "profile.json")
         try:
             profile = get_profile(u, destination)
         except ValueError:
             logger.warning(f"User note found: {u}")
             continue
-        os.makedirs(user_dir, exist_ok=True)
-        with open(user_path, "w") as fp:
-            json.dump(
-                {"created_at": datetime.utcnow().isoformat(), "data": profile}, fp
-            )
+        if out_dir is not None:
+            user_dir = os.path.join(out_dir, u)
+            user_path = os.path.join(user_dir, "profile.json")
+            os.makedirs(user_dir, exist_ok=True)
+            with open(user_path, "w") as fp:
+                json.dump(
+                    {"created_at": datetime.utcnow().isoformat(), "data": profile}, fp
+                )
+        else:
+            print(json.dumps(profile, 2))
 
 
 if __name__ == "__main__":
