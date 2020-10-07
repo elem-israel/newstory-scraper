@@ -36,5 +36,6 @@ WORKDIR /queue
 RUN pip install -r requirements.txt
 
 COPY src /queue/src
+COPY celeryconfig.py /queue/
 
-ENTRYPOINT celery -A src worker --loglevel=info --concurrency 1
+ENTRYPOINT celery -A src worker --loglevel=info -Q * --concurrency 1

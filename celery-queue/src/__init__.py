@@ -13,7 +13,8 @@ app = Celery(
     backend=CELERY_RESULT_BACKEND,
     include=["src.tasks"],
 )
-app.conf.update(result_expires=3600)
+app.config_from_object('celeryconfig')
+
 
 if __name__ == "__main__":
     app.start()

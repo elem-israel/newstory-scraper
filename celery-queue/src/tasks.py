@@ -27,7 +27,6 @@ def hello(string: str) -> str:
     autoretry_for=(HTTPError, ValueError),
     retry_backoff=True,
     retry_kwargs={"max_retries": 5},
-    rate_limit="2/h",
 )
 def scrape_profile(user) -> dict:
     profile = get_profile(user, "/tmp/scraper")
@@ -42,9 +41,11 @@ def scrape_profile(user) -> dict:
 @app.task(name="tasks.upload")
 def upload(user, path) -> str:
     container_name = os.environ["CONTAINER_NAME"]
+    date = datetime.utcnow().isoformat().split("T")[0]
+    blob = f"profiles/{date}/{user}/profile.json"
     blob_client = blob_service_client.get_blob_client(
-        container=container_name, blob=f"profiles/{user}/profile.json"
+        container=container_name, blob=blob
     )
     with open(path, "rb") as data:
         blob_client.upload_blob(data, overwrite=True)
-    return "done"
+    return blob

@@ -1,25 +1,33 @@
 import json
 import logging
 import os
-import sys
 
 from instagram_scraper import InstagramScraper
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
 def get_profile(user: str, destination: str):
+    if os.environ.get("PROXY_USER"):
+        logger.info("using proxy")
+        proxy_url = f"http://{os.environ['PROXY_USER']}:{os.environ['PROXY_PASSWORD']}@{os.environ['PROXY_HOST']}:{os.environ['PROXY_PORT']}"
+    else:
+        proxy_url = None
     logger.info("running instagram scraper")
-    scraper = InstagramScraper(
-        usernames=[user],
-        destination=destination,
-        media_metadata=True,
-        profile_metadata=True,
-        media_types=["none"],
-        maximum=3,
-        comments=True,
-    )
+    kwargs = {
+        "usernames": [user],
+        "destination": destination,
+        "media_metadata": True,
+        "profile_metadata": True,
+        "media_types": ["none"],
+        "maximum": 100,
+        "comments": True,
+        "no_check_certificate": True if proxy_url is not None else False,
+        "proxies": json.dumps({"http": proxy_url, "https": proxy_url})
+        if proxy_url is not None
+        else None,
+    }
+    scraper = InstagramScraper(**kwargs)
     scraper.scrape()
     try:
         with open(os.path.join(destination, f"{user}.json"), encoding="utf8") as fp:
@@ -29,13 +37,13 @@ def get_profile(user: str, destination: str):
 
 
 def get_relations(
-    session, user: str, max_followers: int = "full", followers=True, following=False,
+    session, user: str, max_followers: int = "full", followers=True, following=False
 ):
     logger.info("running instapy")
     res = {}
     if followers:
         res["followers"] = session.grab_followers(
-            username=user, amount=max_followers, live_match=True, store_locally=False,
+            username=user, amount=max_followers, live_match=True, store_locally=False
         )
     if following:
         res["following"] = session.grab_following(
