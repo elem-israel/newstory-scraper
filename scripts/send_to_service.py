@@ -18,17 +18,18 @@ def main():
         profiles = fp.readlines()
     profiles = [p.strip() for p in profiles]
     existing = list(
-        b.name.split("/")[1]
+        b.name.split("/")[-2]
         for b in blob_service_client.get_container_client(container_name).list_blobs(
-            name_starts_with="profiles/"
+            name_starts_with="profiles/2020-10-07/"
         )
     )
-    print(existing)
     to_scrape = list(set(profiles) - set(existing))
     assert len(profiles) > len(to_scrape)
     for user in to_scrape[:500]:
         print(f"sending {user}")
-        res = requests.get(f"http://localhost:3000/scrape/{user}")
+        res = requests.post(
+            f"http://localhost:3000/queue/tasks.profile", json={"args": [user]}
+        )
         res.raise_for_status()
 
 
