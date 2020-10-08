@@ -3,8 +3,9 @@ import Keycloak from "keycloak-connect";
 import { Express } from "express";
 import * as fs from "fs";
 import { redisClient, redisConfig } from "./redis";
+import RedisStore from "connect-redis";
 
-const redisStore = require("connect-redis")(session);
+const redisStore = RedisStore(session);
 export const memoryStore = new session.MemoryStore();
 
 redisClient.on("error", (err: any) => {
