@@ -27,8 +27,16 @@ RUN sed -i "s#deb http://deb.debian.org/debian buster main#deb http://deb.debian
     && sed -i "320s#bitness in name]#bitness in name and name[-3:] != 'asc' ]#g" /usr/local/lib/python3.7/site-packages/webdriverdownloader/webdriverdownloader.py
 
 RUN wget -O '/usr/local/lib/python3.7/site-packages/instapy/xpath_compile.py' https://raw.githubusercontent.com/InstaPy/instapy-docker/master/xpath_compile.py
-ENV CELERY_BROKER_URL redis://redis:6379/0
-ENV CELERY_RESULT_BACKEND redis://redis:6379/0
+
+
+ENV A 1
+ENV B=$A
+RUN echo $B
+ENV REDIS_PASSWORD ""
+ENV REDIS_HOST redis
+ENV REDIS_PORT 6379
+ENV CELERY_BROKER_URL redis://redis:$REDIS_PASSWORD@$REDIS_HOST:$REDIS_PORT/0
+ENV CELERY_RESULT_BACKEND redis://redis:$REDIS_PASSWORD@$REDIS_HOST:$REDIS_PORT/0
 ENV C_FORCE_ROOT true
 ENV QUEUES celery
 
