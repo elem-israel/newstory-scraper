@@ -41,11 +41,6 @@ spec:
                 secretKeyRef:
                   name: azure
                   key: azure_storage_connection_string
-            - name: AZURE_STORAGE_CONNECTION_STRING
-              valueFrom:
-                secretKeyRef:
-                  name: azure
-                  key: azure_storage_connection_string
             - name: CONTAINER_NAME
               valueFrom:
                 secretKeyRef:
