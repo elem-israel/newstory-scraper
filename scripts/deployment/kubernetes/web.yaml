@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: newstorycontainerregistry.azurecr.io/web:latest
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: keycloak-config
+              mountPath: "/etc"
+              readOnly: true
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: AZURE_STORAGE_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: azure
+                  key: azure_storage_connection_string
+            - name: CONTAINER_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: azure
+                  key: container_name
+      volumes:
+        - name: keycloak-config
+          secret:
+            secretName: keycloak-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: 3000
+  selector:
+    app: web

@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-monitor
+  labels:
+    app: celery-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: celery-monitor
+  template:
+    metadata:
+      labels:
+        app: celery-monitor
+    spec:
+      containers:
+        - name: flower
+          ports:
+            - containerPort: 5555
+          image: newstorycontainerregistry.azurecr.io/celery-queue:latest
+          imagePullPolicy: Always
+          command: [ "./start_flower.sh" ]
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis
+                  key: redis-password
+            - name: REDIS_HOST
+              value: "redis-master"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: celery-flower
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5555
+      targetPort: 5555
+  selector:
+    app: celery-monitor
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-worker
+  labels:
+    app: celery-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: celery-worker
+  template:
+    metadata:
+      labels:
+        app: celery-worker
+    spec:
+      containers:
+        - name: worker
+          image: newstorycontainerregistry.azurecr.io/celery-queue:latest
+          imagePullPolicy: Always
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis
+                  key: redis-password
+            - name: REDIS_HOST
+              value: "redis-master"
+            - name: PROXY_USER
+              valueFrom:
+                secretKeyRef:
+                  name: proxy
+                  key: proxy_user
+            - name: PROXY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: proxy
+                  key: proxy_password
+            - name: PROXY_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: proxy
+                  key: proxy_host
+            - name: PROXY_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: proxy
+                  key: proxy_port
+            - name: AZURE_STORAGE_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: azure
+                  key: azure_storage_connection_string
+            - name: CONTAINER_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: azure
+                  key: container_name
+            - name: WORKER
+              value: "1"
