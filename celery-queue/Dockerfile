@@ -30,6 +30,7 @@ RUN wget -O '/usr/local/lib/python3.7/site-packages/instapy/xpath_compile.py' ht
 ENV CELERY_BROKER_URL redis://redis:6379/0
 ENV CELERY_RESULT_BACKEND redis://redis:6379/0
 ENV C_FORCE_ROOT true
+ENV QUEUES celery
 
 COPY requirements.txt /queue/
 WORKDIR /queue
@@ -40,4 +41,4 @@ COPY celeryconfig.py /queue/
 COPY start_flower.sh /queue/
 RUN chmod 755 start_flower.sh
 
-ENTRYPOINT celery -A src worker --loglevel=info -Q * --concurrency 1
+ENTRYPOINT celery -A src worker --loglevel=info -Q $QUEUES --concurrency 1
