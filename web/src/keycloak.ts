@@ -5,8 +5,8 @@ import * as fs from "fs";
 
 export const memoryStore = new session.MemoryStore();
 
-const config = fs.existsSync("/etc/keycloak.json")
-  ? JSON.parse(fs.readFileSync("/etc/keycloak.json").toString())
+const config = fs.existsSync("/etc/keycloak/keycloak.json")
+  ? JSON.parse(fs.readFileSync("/etc/keycloak/keycloak.json").toString())
   : null;
 
 export const keycloak = new Keycloak({ store: memoryStore }, config);
