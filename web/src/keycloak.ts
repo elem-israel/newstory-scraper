@@ -1,9 +1,15 @@
 import session from "express-session";
 import Keycloak from "keycloak-connect";
 import { Express } from "express";
+import * as fs from "fs";
 
 export const memoryStore = new session.MemoryStore();
-export const keycloak = new Keycloak({ store: memoryStore });
+
+const config = fs.existsSync("/etc/keycloak.json")
+  ? JSON.parse(fs.readFileSync("/etc/keycloak.json").toString())
+  : null;
+
+export const keycloak = new Keycloak({ store: memoryStore }, config);
 
 export function installKeycloak(app: Express) {
   app.use(
