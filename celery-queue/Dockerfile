@@ -28,10 +28,6 @@ RUN sed -i "s#deb http://deb.debian.org/debian buster main#deb http://deb.debian
 
 RUN wget -O '/usr/local/lib/python3.7/site-packages/instapy/xpath_compile.py' https://raw.githubusercontent.com/InstaPy/instapy-docker/master/xpath_compile.py
 
-
-ENV A 1
-ENV B=$A
-RUN echo $B
 ENV REDIS_PASSWORD ""
 ENV REDIS_HOST redis
 ENV REDIS_PORT 6379
