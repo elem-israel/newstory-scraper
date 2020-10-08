@@ -19,11 +19,28 @@ spec:
             - containerPort: 3000
           volumeMounts:
             - name: keycloak-config
-              mountPath: "/etc"
+              mountPath: "/etc/keycloak"
               readOnly: true
           env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis
+                  key: redis-password
+            - name: REDIS_HOST
+              value: "redis-master"
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session
+                  key: secret
             - name: NODE_ENV
               value: "production"
+            - name: AZURE_STORAGE_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: azure
+                  key: azure_storage_connection_string
             - name: AZURE_STORAGE_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
