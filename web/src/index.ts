@@ -21,7 +21,6 @@ if (
 }
 
 app.use(bodyParser.json());
-app.use(keycloak.protect("user"));
 app.use("/queue", queue);
 app.use("/auth", auth);
 app.listen(port, () => console.log(`server listening on port ${port}`));
