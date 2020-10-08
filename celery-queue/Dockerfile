@@ -31,8 +31,6 @@ RUN wget -O '/usr/local/lib/python3.7/site-packages/instapy/xpath_compile.py' ht
 ENV REDIS_PASSWORD ""
 ENV REDIS_HOST redis
 ENV REDIS_PORT 6379
-ENV CELERY_BROKER_URL redis://redis:$REDIS_PASSWORD@$REDIS_HOST:$REDIS_PORT/0
-ENV CELERY_RESULT_BACKEND redis://redis:$REDIS_PASSWORD@$REDIS_HOST:$REDIS_PORT/0
 ENV C_FORCE_ROOT true
 ENV QUEUES celery
 
@@ -44,5 +42,7 @@ COPY src /queue/src
 COPY celeryconfig.py /queue/
 COPY start_flower.sh /queue/
 RUN chmod 755 start_flower.sh
+COPY start_worker.sh /queue/
+RUN chmod 755 start_worker.sh
 
-ENTRYPOINT celery -A src worker --loglevel=info -Q $QUEUES --concurrency 1
+ENTRYPOINT ./start_worker.sh
