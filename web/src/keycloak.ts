@@ -1,24 +1,26 @@
 import session from "express-session";
-import Keycloak from "keycloak-connect";
+import Keycloak, { Keycloak as KeyCloakClient } from "keycloak-connect";
 import { Express } from "express";
 import * as fs from "fs";
 import { redisClient, redisConfig } from "./redis";
-import RedisStore from "connect-redis";
+import RedisStoreBuilder from "connect-redis";
 
-const redisStore = RedisStore(session);
-export const memoryStore = new session.MemoryStore();
-
-redisClient.on("error", (err: any) => {
-  console.error("Redis error: ", err);
-});
-
-const config = fs.existsSync("/etc/keycloak/keycloak.json")
-  ? JSON.parse(fs.readFileSync("/etc/keycloak/keycloak.json").toString())
-  : null;
-
-export const keycloak = new Keycloak({ store: memoryStore }, config);
+export let keycloak: KeyCloakClient;
 
 export function installKeycloak(app: Express) {
+  const RedisStore = RedisStoreBuilder(session);
+  const memoryStore = new session.MemoryStore();
+
+  redisClient.on("error", (err: any) => {
+    console.error("Redis error: ", err);
+  });
+
+  const config = fs.existsSync("/etc/keycloak/keycloak.json")
+    ? JSON.parse(fs.readFileSync("/etc/keycloak/keycloak.json").toString())
+    : null;
+
+  keycloak = new Keycloak({ store: memoryStore }, config);
+
   app.use(
     session({
       secret: process.env.SESSION_SECRET,
@@ -26,11 +28,11 @@ export function installKeycloak(app: Express) {
       resave: false,
       saveUninitialized: true,
       cookie: { secure: false }, // Note that the cookie-parser module is no longer needed
-      store: new redisStore({
+      store: new RedisStore({
         ...redisConfig,
         client: redisClient,
         ttl: 86400,
-      }),
+      } as any),
     })
   );
   app.use(keycloak.middleware());
