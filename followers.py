@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 @click.option("--file", "input_file", type=click.File("r"))
 @click.option("--out", "out_dir", type=click.Path(), default="output")
 @click.option("--max-followers", type=int)
-@click.option("--cloud", type=bool)
+@click.option("--cloud/--no-cloud", default=False)
 def main(users, input_file, out_dir, max_followers, cloud):
     if users:
         users_list = users.split(",")
@@ -49,17 +49,15 @@ def main(users, input_file, out_dir, max_followers, cloud):
             with open(user_path, "w") as fp:
                 json.dump({"created_at": created_at.isoformat(), "data": relations}, fp)
             if cloud:
-                cloud_path = os.path.join(
-                    "profiles",
-                    created_at.strftime("%Y-%m-%d"),
-                    user_dir,
-                    "relations.json",
+                cloud_path = "/".join(
+                    ["profiles", created_at.strftime("%Y-%m-%d"), u, "relations.json"]
                 )
                 upload_to_azure_storage(
                     os.environ["AZURE_STORAGE_CONNECTION_STRING"],
                     user_path,
-                    os.environ["AZURE_STORAGE_CONTAINER"],
+                    os.environ["CONTAINER_NAME"],
                     cloud_path,
+                    overwrite=True,
                 )
 
 
