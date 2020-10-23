@@ -6,8 +6,4 @@ export const redisConfig: ClientOpts = {
   port: Number.parseInt(process.env.REDIS_PORT) || 6379,
 };
 
-export const redisClient = redis.createClient(redisConfig);
-
-redisClient.on("error", (err: any) => {
-  console.error("Redis error: ", err);
-});
+export const getRedisClient = () => redis.createClient(redisConfig);

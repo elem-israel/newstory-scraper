@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import queue from "./routes/queue";
 import auth from "./routes/auth";
-import { installKeycloak, keycloak } from "./keycloak";
+import { installDevKeycloak, installKeycloak, keycloak } from "./keycloak";
 import bodyParser from "body-parser";
 
 const port = process.env.PORT || 3000;
@@ -17,6 +17,11 @@ if (
   Number.parseInt(process.env.USE_AUTH)
 ) {
   installKeycloak(app);
+  app.use(keycloak.protect());
+}
+
+if (Number.parseInt(process.env.TEST_AUTH)){
+  installDevKeycloak(app)
   app.use(keycloak.protect());
 }
 
