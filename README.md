@@ -34,3 +34,9 @@ Task changes should happen in [queue/tasks.py](celery-queue/src/tasks.py)
 ---
 
 adapted from [https://github.com/itsrifat/flask-celery-docker-scale](https://github.com/itsrifat/flask-celery-docker-scale)
+
+## Troubleshooting
+Problems when loading keycloak (mixed content):
+https://keycloak.discourse.group/t/keycloak-in-docker-behind-reverse-proxy/1195/13
+
+[Securing Node.js Express REST APIs with Keycloak](https://medium.com/devops-dudes/securing-node-js-express-rest-apis-with-keycloak-a4946083be51)

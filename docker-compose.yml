@@ -15,7 +15,7 @@ services:
       - AZURE_STORAGE_CONNECTION_STRING
       - CONTAINER_NAME
     ports:
-      - 3000:3000
+      - 3030:3000
     volumes:
       - ./web:/app
     depends_on:
@@ -67,7 +67,8 @@ services:
     ports:
       - "5555:5555"
     environment:
-      - CELERY_BROKER_URL
+      - CELERY_BROKER_URL=redis://redis:6379
+      - REDIS_HOST=redis
     entrypoint: ./start_flower.sh
     depends_on:
       - redis

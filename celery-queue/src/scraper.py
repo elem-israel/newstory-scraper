@@ -7,7 +7,7 @@ from instagram_scraper import InstagramScraper
 logger = logging.getLogger(__name__)
 
 
-def get_profile(user: str, destination: str):
+def get_profile(user: str, destination: str, maximum=100):
     if os.environ.get("PROXY_USER"):
         logger.info("using proxy")
         proxy_url = f"http://{os.environ['PROXY_USER']}:{os.environ['PROXY_PASSWORD']}@{os.environ['PROXY_HOST']}:{os.environ['PROXY_PORT']}"
@@ -20,7 +20,7 @@ def get_profile(user: str, destination: str):
         "media_metadata": True,
         "profile_metadata": True,
         "media_types": ["none"],
-        "maximum": 100,
+        "maximum": maximum,
         "comments": True,
         "no_check_certificate": True if proxy_url is not None else False,
         "proxies": json.dumps({"http": proxy_url, "https": proxy_url})

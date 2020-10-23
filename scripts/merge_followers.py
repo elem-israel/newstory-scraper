@@ -8,17 +8,24 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+def comma_separated(ctx, param, value):
+    if value is not None:
+        return value.split(",")
+
+
 @click.command()
-@click.argument("input-dir", type=click.Path(dir_okay=True, file_okay=False))
+@click.option(
+    "input-dir", type=click.Path(dir_okay=True, file_okay=False), required=False
+)
 @click.argument("out", type=click.File("w"))
-def main(input_dir, out):
-    users = os.listdir(input_dir)
+def main(input_dir, out, profiles):
+    profiles = os.listdir(input_dir)
     all = []
-    for u in users:
+    for u in profiles:
         relations_path = os.path.join(input_dir, u, "relations.json")
         if os.path.exists(relations_path):
             with open(relations_path) as fp:

@@ -20,21 +20,21 @@ batch = 500
 def main():
     with open("D:/tmp/newstory/youth.txt", "r") as fp:
         profiles = fp.readlines()
+    with open("D:/tmp/newstory/labeled_youth.txt", "r") as fp:
+        profiles += fp.readlines()
     profiles = [p.strip() for p in profiles]
     existing = list(
         b.name.split("/")[-2]
         for b in blob_service_client.get_container_client(container_name).list_blobs(
-            name_starts_with="profiles/2020-10-07/"
+            name_starts_with="profiles/"
         )
     )
     to_scrape = list(set(profiles) - set(existing))
     assert len(profiles) > len(to_scrape)
-    if len(to_scrape) < batch:
-        sample = random.sample
-    for user in to_scrape[:500]:
+    for user in to_scrape:
         print(f"sending {user}")
         res = requests.post(
-            f"http://localhost:3000/queue/tasks.profile", json={"args": [user]}
+            f"http://localhost:3030/queue/tasks.profile", json={"args": [user]}
         )
         res.raise_for_status()
 
