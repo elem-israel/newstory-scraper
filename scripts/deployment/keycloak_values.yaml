@@ -1,0 +1,8 @@
+extraEnv: |
+  - name: KEYCLOAK_USER
+    value: admin
+  - name: KEYCLOAK_PASSWORD
+    value: admin
+  # https://keycloak.discourse.group/t/keycloak-in-docker-behind-reverse-proxy/1195/13
+  - name: PROXY_ADDRESS_FORWARDING
+    value: "true"

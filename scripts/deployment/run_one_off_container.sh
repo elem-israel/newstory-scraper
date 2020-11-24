@@ -1,0 +1,1 @@
+kubectl run oneoff -it --rm --command bash --image=newstorycontainerregistry.azurecr.io/celery-queue:latest
