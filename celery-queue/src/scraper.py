@@ -21,7 +21,7 @@ def get_profile(user: str, destination: str, maximum=100):
         "profile_metadata": True,
         "media_types": ["none"],
         "maximum": maximum,
-        "comments": True,
+        "comments": False,  # TODO comments are not working https://github.com/arc298/instagram-scraper/issues/615
         "no_check_certificate": True if proxy_url is not None else False,
         "proxies": json.dumps({"http": proxy_url, "https": proxy_url})
         if proxy_url is not None
