@@ -26,21 +26,13 @@ RUN sed -i "s#deb http://deb.debian.org/debian buster main#deb http://deb.debian
   # Fix webdriverdownloader not handling asc files
   && sed -i "s#bitness in name]#bitness in name and name[-3:] != 'asc' ]#g" /usr/local/lib/python3.7/site-packages/webdriverdownloader/webdriverdownloader.py
 
-ENV REDIS_PASSWORD ""
-ENV REDIS_HOST redis
-ENV REDIS_PORT 6379
-ENV C_FORCE_ROOT true
-ENV QUEUES celery
-
-COPY requirements.txt /queue/
-WORKDIR /queue
+WORKDIR /usr/src/app
+COPY requirements.txt /usr/src/app/
 RUN pip install -r requirements.txt
 
-COPY src /queue/src
-COPY celeryconfig.py /queue/
-COPY start_flower.sh /queue/
-RUN chmod 755 start_flower.sh
-COPY start_worker.sh /queue/
-RUN chmod 755 start_worker.sh
+COPY src /usr/src/app/
+COPY entrypoint.sh /user/src/app/
+COPY consumer.py /user/src/app/
+RUN chmod 755 entrypoint.sh
 
-ENTRYPOINT ./start_worker.sh
+ENTRYPOINT ./entrypoint.sh

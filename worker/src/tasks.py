@@ -1,13 +1,17 @@
 from datetime import datetime
 import json
 import os
-import time
+import logging
+import sys
 
-from . import app
-from requests import HTTPError
 from azure.storage.blob import BlobServiceClient
 
+from . import consumers
 from .scraper import get_profile
+
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 if int(os.getenv("WORKER", 0)):
     blob_service_client = BlobServiceClient.from_connection_string(
@@ -15,19 +19,12 @@ if int(os.getenv("WORKER", 0)):
     )
 
 
-@app.task(name="tasks.echo")
-def hello(string: str) -> str:
-    time.sleep(5)
-    print(string)
-    return string
+def test(event):
+    event_data = event.value
+    # Do whatever you want
+    print(event_data)
 
 
-@app.task(
-    name="tasks.profile",
-    autoretry_for=(HTTPError, ValueError),
-    retry_backoff=True,
-    retry_kwargs={"max_retries": 5},
-)
 def scrape_profile(user) -> dict:
     profile = get_profile(user, "/tmp/scraper")
     path = f"/tmp/profiles/{user}/profile.json"
@@ -38,7 +35,6 @@ def scrape_profile(user) -> dict:
     return profile
 
 
-@app.task(name="tasks.upload")
 def upload(path) -> str:
     container_name = os.environ["CONTAINER_NAME"]
     with open(path, "r") as fp:
@@ -52,3 +48,12 @@ def upload(path) -> str:
     with open(path, "rb") as data:
         blob_client.upload_blob(data, overwrite=True)
     return blob
+
+
+tasks = {"profile": scrape_profile, "test": test}
+
+
+def main(topic):
+    logger.info(f"listening to: {topic}")
+    for event in consumers.get(topic):
+        tasks[event.topic](event)
