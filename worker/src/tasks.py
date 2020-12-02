@@ -6,10 +6,8 @@ import sys
 
 from azure.storage.blob import BlobServiceClient
 
-from . import consumers
 from .scraper import get_profile
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -19,9 +17,8 @@ if int(os.getenv("WORKER", 0)):
     )
 
 
-def test(event):
+def echo(event):
     event_data = event.value
-    # Do whatever you want
     print(event_data)
 
 
@@ -50,10 +47,4 @@ def upload(path) -> str:
     return blob
 
 
-tasks = {"profile": scrape_profile, "test": test}
-
-
-def main(topic):
-    logger.info(f"listening to: {topic}")
-    for event in consumers.get(topic):
-        tasks[event.topic](event)
+tasks = {"profile": scrape_profile, "Echo": echo}

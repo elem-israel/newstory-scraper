@@ -5,31 +5,43 @@ services:
     image: 'docker.io/bitnami/express:4-debian-10'
     command: npm run dev-docker
     environment:
+      - KAFKA_HOST=kafka
+      - KAFKA_PORT=9093
       - PORT=3000
       - NODE_ENV=development
       - SKIP_NPM_INSTALL=0
-      - KAFKA_HOST=kafka
-      - KAFKA_PORT=9092
       - AZURE_STORAGE_CONNECTION_STRING
       - CONTAINER_NAME
     ports:
       - 3030:3000
     volumes:
       - ./web:/app
-  profile_worker:
+  echo_worker:
     environment:
+      - KAFKA_HOST=kafka
+      - KAFKA_PORT=9093
       - AZURE_STORAGE_CONNECTION_STRING
       - CONTAINER_NAME
-      - PROXY_USER
-      - PROXY_PASSWORD
-      - PROXY_HOST
-      - PROXY_PORT
+      - KAFKA_TOPICS=Echo
+      - KAFKA_TOPIC=Echo
     build:
       context: worker
-    volumes:
-      - C:/tmp/newstory/profiles:/tmp/profiles
     depends_on:
       - kafka
+#  profile_worker:
+#    environment:
+#      - AZURE_STORAGE_CONNECTION_STRING
+#      - CONTAINER_NAME
+#      - PROXY_USER
+#      - PROXY_PASSWORD
+#      - PROXY_HOST
+#      - PROXY_PORT
+#    build:
+#      context: worker
+#    volumes:
+#      - C:/tmp/newstory/profiles:/tmp/profiles
+#    depends_on:
+#      - kafka
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
@@ -46,5 +58,7 @@ services:
       KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "Echo:1:1"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

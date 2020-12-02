@@ -21,7 +21,7 @@ consumers = {
     topic: KafkaConsumer(
         topic,
         bootstrap_servers=[
-            f'{os.getenv("KAFKA_URL", "localhost")}:{os.getenv("KAFKA_PORT", "9092")}'
+            f'{os.getenv("KAFKA_HOST", "localhost")}:{os.getenv("KAFKA_PORT", "9092")}'
         ],
         **config["consumer"]["default"],
         **config["consumer"].get(topic, {}),
@@ -32,7 +32,7 @@ consumers = {
 producers = {
     topic: KafkaProducer(
         bootstrap_servers=[
-            f'{os.getenv("KAFKA_URL", "localhost")}:{os.getenv("KAFKA_PORT", "9092")}'
+            f'{os.getenv("KAFKA_HOST", "localhost")}:{os.getenv("KAFKA_PORT", "9092")}'
         ],
         **config["producer"]["default"],
         **config["producer"].get(topic, {}),
