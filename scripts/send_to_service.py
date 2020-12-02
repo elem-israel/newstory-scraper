@@ -1,5 +1,6 @@
+import json
 import os
-from random import random
+from random import random, shuffle
 
 from dotenv import load_dotenv
 from azure.storage.blob import BlobServiceClient
@@ -18,19 +19,22 @@ batch = 500
 
 
 def main():
-    with open("D:/tmp/newstory/youth.txt", "r") as fp:
-        profiles = fp.readlines()
-    with open("D:/tmp/newstory/labeled_youth.txt", "r") as fp:
-        profiles += fp.readlines()
+    with open("D:/tmp/newstory/followers.json", "r") as fp:
+        followers = json.load(fp)
+    profiles = []
+    with open("D:/tmp/newstory/labeled_groups.txt", "r") as fp:
+        for group in fp.readlines():
+            profiles += followers.get(group.strip(), {}).get("data", {}).get("followers", [])
     profiles = [p.strip() for p in profiles]
     existing = list(
         b.name.split("/")[-2]
         for b in blob_service_client.get_container_client(container_name).list_blobs(
-            name_starts_with="profiles/"
+            name_starts_with="profiles/2020-11"
         )
     )
     to_scrape = list(set(profiles) - set(existing))
     assert len(profiles) > len(to_scrape)
+    shuffle(to_scrape)
     for user in to_scrape:
         print(f"sending {user}")
         res = requests.post(
