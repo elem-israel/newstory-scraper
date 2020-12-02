@@ -8,69 +8,43 @@ services:
       - PORT=3000
       - NODE_ENV=development
       - SKIP_NPM_INSTALL=0
-      - VAR=2
-      - CELERY_BROKER_URL=redis://redis:6379
-      - CELERY_RESULT_BACKEND=redis://redis:6379
-      - FLOWER_URL=http://monitor:5555
+      - KAFKA_HOST=kafka
+      - KAFKA_PORT=9092
       - AZURE_STORAGE_CONNECTION_STRING
       - CONTAINER_NAME
     ports:
       - 3030:3000
     volumes:
       - ./web:/app
-    depends_on:
-      - redis
   profile_worker:
     environment:
-      - CELERY_BROKER_URL=redis://redis:6379
-      - CELERY_RESULT_BACKEND=redis://redis:6379
       - AZURE_STORAGE_CONNECTION_STRING
       - CONTAINER_NAME
-      - WORKER=1
       - PROXY_USER
       - PROXY_PASSWORD
       - PROXY_HOST
       - PROXY_PORT
     build:
-      context: ./celery-queue
-      dockerfile: Dockerfile
-    entrypoint: celery
-    command: -A src worker --loglevel=info --concurrency 1 -Q profile
+      context: worker
     volumes:
-      - D:/tmp/newstory/profiles:/tmp/profiles
+      - C:/tmp/newstory/profiles:/tmp/profiles
     depends_on:
-      - redis
-  upload_worker:
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379
-      - CELERY_RESULT_BACKEND=redis://redis:6379
-      - AZURE_STORAGE_CONNECTION_STRING
-      - CONTAINER_NAME
-      - WORKER=1
-      - PROXY_USER
-      - PROXY_PASSWORD
-      - PROXY_HOST
-      - PROXY_PORT
-    build:
-      context: ./celery-queue
-      dockerfile: Dockerfile
-    entrypoint: celery
-    command: -A src worker --loglevel=info --concurrency 1 -Q upload
-    volumes:
-      - D:/tmp/newstory/profiles:/tmp/profiles
-    depends_on:
-      - redis
-  monitor:
-    build:
-      context: ./celery-queue
-      dockerfile: Dockerfile
+      - kafka
+  zookeeper:
+    image: wurstmeister/zookeeper
     ports:
-      - "5555:5555"
+      - "2181:2181"
+  kafka:
+    image: wurstmeister/kafka:2.12-2.5.0
+    ports:
+     - "9092:9092"
+    expose:
+     - "9093"
     environment:
-      - CELERY_BROKER_URL=redis://redis:6379
-      - REDIS_HOST=redis
-    entrypoint: ./start_flower.sh
-    depends_on:
-      - redis
-  redis:
-    image: redis:6.0.8
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

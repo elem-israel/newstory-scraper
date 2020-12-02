@@ -33,6 +33,6 @@ RUN pip install -r requirements.txt
 COPY src /usr/src/app/
 COPY entrypoint.sh /user/src/app/
 COPY consumer.py /user/src/app/
-RUN chmod 755 entrypoint.sh
+RUN chmod 755 /user/src/app/entrypoint.sh
 
 ENTRYPOINT ./entrypoint.sh
