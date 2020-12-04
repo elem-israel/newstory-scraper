@@ -62,3 +62,9 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+  magic:
+    image: digitsy/kafka-magic
+    ports:
+      - "8080:80"
+    environment:
+      KMAGIC_ALLOW_TOPIC_DELETE: "true"

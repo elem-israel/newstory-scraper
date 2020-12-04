@@ -1,5 +1,6 @@
 import json
 import os
+from typing import Dict
 
 from kafka import KafkaConsumer, KafkaProducer
 
@@ -17,7 +18,7 @@ config = {
     },
 }
 
-consumers = {
+consumers: Dict[str, KafkaConsumer] = {
     topic: KafkaConsumer(
         topic,
         bootstrap_servers=[
@@ -29,7 +30,7 @@ consumers = {
     for topic in os.environ["KAFKA_TOPICS"].split(",")
 }
 
-producers = {
+producers: Dict[str, KafkaProducer] = {
     topic: KafkaProducer(
         bootstrap_servers=[
             f'{os.getenv("KAFKA_HOST", "localhost")}:{os.getenv("KAFKA_PORT", "9092")}'

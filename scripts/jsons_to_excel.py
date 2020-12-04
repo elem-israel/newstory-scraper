@@ -33,17 +33,29 @@ def filter_existing_blobs(blobs):
     return df[~df.PROFILES.isin(existing)].BLOB.tolist()
 
 
+def iter_up_to(iterable, m):
+    res = []
+    c = 0
+    while c < m:
+        res.append(next(iterable))
+        c += 1
+    return res
+
+
 def main():
-    blobs = list(
+    blobs = [
         b.name
-        for b in blob_service_client.get_container_client(container_name).list_blobs(
-            name_starts_with="profiles/"
+        for b in iter_up_to(
+            blob_service_client.get_container_client(container_name).list_blobs(
+                name_starts_with="profiles/"
+            ),
+            2000,
         )
-    )
+    ]
     filtered = filter_existing_blobs(blobs)
     assert len(filtered) < len(blobs)
 
-    bar = tqdm(total=len(filtered))
+    bar = tqdm(total=len(filtered[:500]))
 
     def f(blob):
         res = json.loads(read_blob(blob))
@@ -51,7 +63,7 @@ def main():
         return res
 
     with ThreadPoolExecutor(max_workers=os.cpu_count()) as pool:
-        profiles: List[dict] = list(pool.map(f, filtered[:2000]))
+        profiles: List[dict] = list(pool.map(f, filtered[:500]))
     df = pd.DataFrame(
         index=[p["data"]["GraphProfileInfo"]["username"] for p in profiles]
     )
