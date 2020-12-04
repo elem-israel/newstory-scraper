@@ -15,10 +15,29 @@ def get_bool_from_env(key):
 
 
 def extract_profile(dictionary):
+    extracted = extract_jsonpath("$.data.GraphProfileInfo.info", dictionary)[0]
     return {
         "created_at": extract_jsonpath("$.created_at", dictionary)[0],
-        "username": extract_jsonpath("$.data.GraphProfileInfo.username", dictionary)[0],
-        **extract_jsonpath("$.data.GraphProfileInfo.info", dictionary)[0],
+        "profile_created_at": datetime.utcfromtimestamp(
+            extract_jsonpath("$.data.GraphProfileInfo.created_time", dictionary)[0]
+        ),
+        "instagram_profile_id": extracted["id"],
+        **{
+            k: v
+            for k, v in extracted.items()
+            if k
+            in (
+                "username",
+                "followers_count",
+                "biography",
+                "following_count",
+                "full_name",
+                "is_business_account",
+                "is_private",
+                "posts_count",
+                "profile_pic_url",
+            )
+        },
     }
 
 
@@ -30,11 +49,11 @@ def extract_posts(dictionary):
     posts = extract_jsonpath("$.data.GraphImages", dictionary)[0]
     posts = [
         {
-            "taken_at": datetime.fromtimestamp(post["taken_at_timestamp"]),
-            "id": post["id"],
-            **get_from_list(
-                extract_jsonpath("$.edge_media_to_caption.edges..node", post),
-                default={},
+            "taken_at": datetime.utcfromtimestamp(post["taken_at_timestamp"]),
+            "instagram_post_id": post["id"],
+            "instagram_author_profile_id": extract_jsonpath("$.owner.id", post)[0],
+            "caption": get_from_list(
+                extract_jsonpath("$.edge_media_to_caption.edges..node.text", post)
             ),
         }
         for post in posts

@@ -9,25 +9,25 @@ CREATE TABLE fact_profiles
     is_private           BIT,
     is_business_account  BIT,
     posts_count          INT,
-    estimated_birth_year INT,
     profile_pic_url      TEXT,
-    biography            TEXY,
+    biography            TEXT,
     followers_count      INT,
     following_count      INT,
     full_name            TEXT,
-    created_date         datetime DEFAULT CURRENT_TIMESTAMP,
-    estimated_risk       INT
+    created_date         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
-CREATE TABLE posts
+DROP TABLE IF EXISTS fact_posts;
+CREATE TABLE fact_posts
 (
     id                          INT PRIMARY KEY IDENTITY (1,1),
     instagram_post_id           TEXT NOT NULL,
     instagram_author_profile_id TEXT NOT NULL,
-    created_date                date DEFAULT CURRENT_TIMESTAMP,
+    caption                     INT,
     likes_counter               INT,
-    estimated_author_age        INT
+    taken_at                    TIMESTAMP,
+    created_date                TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE post_hashtags
