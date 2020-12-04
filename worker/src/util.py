@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import jsonpath_ng
 
@@ -19,6 +20,26 @@ def extract_profile(dictionary):
         "username": extract_jsonpath("$.data.GraphProfileInfo.username", dictionary)[0],
         **extract_jsonpath("$.data.GraphProfileInfo.info", dictionary)[0],
     }
+
+
+def get_from_list(iterable: list, index=0, default=None):
+    return (iterable[index : index + 1] or [default])[index]
+
+
+def extract_posts(dictionary):
+    posts = extract_jsonpath("$.data.GraphImages", dictionary)[0]
+    posts = [
+        {
+            "taken_at": datetime.fromtimestamp(post["taken_at_timestamp"]),
+            "id": post["id"],
+            **get_from_list(
+                extract_jsonpath("$.edge_media_to_caption.edges..node", post),
+                default={},
+            ),
+        }
+        for post in posts
+    ]
+    return posts
 
 
 def extract_jsonpath(expression, dictionary):
