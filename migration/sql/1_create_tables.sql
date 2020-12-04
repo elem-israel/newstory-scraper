@@ -1,17 +1,24 @@
-DROP TABLE IF EXISTS profiles;
-CREATE TABLE profiles
+DROP TABLE IF EXISTS fact_profiles;
+CREATE TABLE fact_profiles
 (
     id                   INT PRIMARY KEY IDENTITY (1,1),
-    instagram_profile_id  TEXT NOT NULL,
+    username             TEXT,
+    instagram_profile_id TEXT NOT NULL,
     followers_counter    INT,
     following_counter    INT,
     is_private           BIT,
-    is_business          BIT,
+    is_business_account  BIT,
+    posts_count          INT,
     estimated_birth_year INT,
+    profile_pic_url      TEXT,
+    biography            TEXY,
+    followers_count      INT,
+    following_count      INT,
+    full_name            TEXT,
     created_date         datetime DEFAULT CURRENT_TIMESTAMP,
-    updated_date         datetime DEFAULT CURRENT_TIMESTAMP,
     estimated_risk       INT
 );
+
 
 CREATE TABLE posts
 (
