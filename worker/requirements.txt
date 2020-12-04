@@ -9,3 +9,4 @@ azure-storage-blob==12.5.0
 numpy==1.19.1
 kafka-python==2.0.2
 jsonpath-ng
+sqlalchemy==1.3.20
