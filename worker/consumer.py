@@ -19,7 +19,8 @@ if __name__ == "__main__":
     while (datetime.now() - start).total_seconds() < 120:
         try:
             from src.main import main
-            main(sys.argv[1])
+
+            main()
         except:
             traceback.print_exc()
             sleep(2)

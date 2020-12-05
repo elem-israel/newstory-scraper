@@ -17,10 +17,13 @@ def get_bool_from_env(key):
 def extract_profile(dictionary):
     extracted = extract_jsonpath("$.data.GraphProfileInfo.info", dictionary)[0]
     return {
-        "created_at": extract_jsonpath("$.created_at", dictionary)[0],
+        "created_date": datetime.fromisoformat(
+            extract_jsonpath("$.created_at", dictionary)[0]
+        ),
         "profile_created_at": datetime.utcfromtimestamp(
             extract_jsonpath("$.data.GraphProfileInfo.created_time", dictionary)[0]
         ),
+        "username": extract_jsonpath("$.data.GraphProfileInfo.username", dictionary)[0],
         "instagram_profile_id": extracted["id"],
         **{
             k: v
@@ -49,12 +52,16 @@ def extract_posts(dictionary):
     posts = extract_jsonpath("$.data.GraphImages", dictionary)[0]
     posts = [
         {
+            "created_date": datetime.fromisoformat(
+                extract_jsonpath("$.created_at", dictionary)[0]
+            ),
             "taken_at": datetime.utcfromtimestamp(post["taken_at_timestamp"]),
             "instagram_post_id": post["id"],
             "instagram_author_profile_id": extract_jsonpath("$.owner.id", post)[0],
             "caption": get_from_list(
                 extract_jsonpath("$.edge_media_to_caption.edges..node.text", post)
             ),
+            "likes_count": extract_jsonpath("$.edge_media_preview_like.count", post)[0]
         }
         for post in posts
     ]
