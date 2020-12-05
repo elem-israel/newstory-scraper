@@ -49,7 +49,9 @@ def get_from_list(iterable: list, index=0, default=None):
 
 
 def extract_posts(dictionary):
-    posts = extract_jsonpath("$.data.GraphImages", dictionary)[0]
+    posts = get_from_list(
+        extract_jsonpath("$.data.GraphImages", dictionary), default=[]
+    )
     posts = [
         {
             "created_date": datetime.fromisoformat(
@@ -61,7 +63,7 @@ def extract_posts(dictionary):
             "caption": get_from_list(
                 extract_jsonpath("$.edge_media_to_caption.edges..node.text", post)
             ),
-            "likes_count": extract_jsonpath("$.edge_media_preview_like.count", post)[0]
+            "likes_count": extract_jsonpath("$.edge_media_preview_like.count", post)[0],
         }
         for post in posts
     ]
