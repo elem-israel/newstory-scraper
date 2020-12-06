@@ -1,7 +1,7 @@
 import logging
 import os
 import traceback
-from . import tasks, consumer
+from . import tasks, consumer, producer
 
 logger = logging.getLogger(__name__)
 
@@ -20,3 +20,4 @@ def main():
             topic_to_task.get(event.topic)(event.value)
         except:
             logger.error(traceback.format_exc())
+            producer.send("newstory.deadLetter", value=event)
