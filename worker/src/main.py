@@ -20,4 +20,7 @@ def main():
             topic_to_task.get(event.topic)(event.value)
         except:
             logger.error(traceback.format_exc())
-            producer.send("newstory.deadLetter", value=event)
+            producer.send(
+                "newstory.deadLetter",
+                value={"event": event, "stack": traceback.format_exc()},
+            )
