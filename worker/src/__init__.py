@@ -8,7 +8,7 @@ config = {
         "default": {
             "auto_offset_reset": "earliest",
             "enable_auto_commit": True,
-            "group_id": "my-group-id",
+            "group_id": os.getenv("KAFKA_GROUP_ID", "newstory-kafka-worker"),
             "value_deserializer": lambda x: json.loads(x.decode("utf-8")),
         }
     },
@@ -17,13 +17,16 @@ config = {
     },
 }
 
-consumer = KafkaConsumer(
-    *os.environ["KAFKA_TOPICS_LISTENER"].split(","),
-    bootstrap_servers=[
-        f'{os.getenv("KAFKA_HOST", "localhost")}:{os.getenv("KAFKA_PORT", "9092")}'
-    ],
-    **config["consumer"]["default"],
-)
+
+def get_consumer():
+    return KafkaConsumer(
+        *os.environ["KAFKA_TOPICS_LISTENER"].split(","),
+        bootstrap_servers=[
+            f'{os.getenv("KAFKA_HOST", "localhost")}:{os.getenv("KAFKA_PORT", "9092")}'
+        ],
+        **config["consumer"]["default"],
+    )
+
 
 producer = KafkaProducer(
     bootstrap_servers=[
