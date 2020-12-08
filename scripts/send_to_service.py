@@ -1,7 +1,6 @@
-import json
 import os
-from random import random, shuffle
 
+import pandas as pd
 from dotenv import load_dotenv
 from azure.storage.blob import BlobServiceClient
 import requests
@@ -19,20 +18,16 @@ batch = 500
 
 
 def main():
-    blobs = list(
-        blob_service_client.get_container_client(container_name).list_blobs(
-            name_starts_with="profiles/2020-11"
-        )
-    )
-    # remove duplicates
-    profiles = {b.name.split("/")[-2]: b for b in blobs}
-    for blob in profiles.values():
-        print(f"sending {blob}")
-        res = requests.post(
-            f"http://localhost:3030/queue/newstory.tasks.newEntry",
-            json={"message": blob.name},
-        )
-        res.raise_for_status()
+    for d in pd.date_range("2020-09-01", "2020-11-30", freq="D"):
+        for blob in blob_service_client.get_container_client(container_name).list_blobs(
+            name_starts_with=f"profiles/{d.strftime('%Y-%m-%d')}"
+        ):
+            print(f"sending {blob.name}")
+            res = requests.post(
+                f"http://localhost:3030/queue/newstory.tasks.newEntry",
+                json={"message": blob.name},
+            )
+            res.raise_for_status()
 
 
 if __name__ == "__main__":
