@@ -1,7 +1,7 @@
 import logging
 import os
 import traceback
-from . import tasks, consumer, producer
+from . import tasks, get_consumer, producer
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +14,7 @@ topic_to_task = {
 
 def main():
     logger.info(f"listening to: {os.environ['KAFKA_TOPICS_LISTENER']}")
-    for event in consumer:
+    for event in get_consumer():
         logger.info(f"received event, {event}")
         try:
             topic_to_task.get(event.topic)(event.value)

@@ -4,6 +4,7 @@ import os
 import logging
 
 from azure.storage.blob import BlobServiceClient
+import pyodbc
 import sqlalchemy as sa
 
 from . import producer
@@ -40,14 +41,17 @@ def insert_to_db(blob, container_name=None) -> dict:
     )
     parsed = json.loads(data)
     logger.info("starting transaction")
-    with engine.begin() as con:
-        logger.info("inserting profile")
-        profile = extract_profile(parsed)
-        profile_to_sql(con, profile)
-        logger.info("inserting posts")
-        posts = extract_posts(parsed)
-        posts_to_sql(con, posts)
-        logger.info("committing transaction")
+    try:
+        with engine.begin() as con:
+            logger.info("inserting profile")
+            profile = extract_profile(parsed)
+            profile_to_sql(con, profile)
+            logger.info("inserting posts")
+            posts = extract_posts(parsed)
+            posts_to_sql(con, posts)
+            logger.info("committing transaction")
+    except pyodbc.IntegrityError as err:
+        logger.info(f"Duplicate entry:\n{err}")
 
 
 def upload(path) -> str:
