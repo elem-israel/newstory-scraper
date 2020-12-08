@@ -6,10 +6,12 @@ from kafka import KafkaConsumer, KafkaProducer
 config = {
     "consumer": {
         "default": {
-            "auto_offset_reset": "earliest",
+            "auto_offset_reset": "latest",
             "enable_auto_commit": True,
             "group_id": os.getenv("KAFKA_GROUP_ID", "newstory-kafka-worker"),
             "value_deserializer": lambda x: json.loads(x.decode("utf-8")),
+            "session_timeout_ms": 60000,
+            "heartbeat_interval_ms": 10000,
         }
     },
     "producer": {
