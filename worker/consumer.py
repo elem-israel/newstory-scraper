@@ -4,6 +4,8 @@ import sys
 from time import sleep
 import traceback
 
+from src.main import main
+
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 try:
@@ -18,11 +20,9 @@ if __name__ == "__main__":
     start = datetime.now()
     while (datetime.now() - start).total_seconds() < 120:
         try:
-            from src.main import main
-
             main()
         except:
             traceback.print_exc()
-            sleep(2)
+            sleep(5)
             print("retrying...")
     exit(1)
