@@ -4,12 +4,10 @@ import os
 
 from dotenv import load_dotenv
 import sqlalchemy as sa
-from tqdm import tqdm
 
 load_dotenv()
 
 engine = sa.create_engine(os.environ["DATABASE_CONNECTION_STRING"])
-
 
 pmap = ThreadPoolExecutor(max_workers=os.cpu_count()).map
 
@@ -22,25 +20,33 @@ def main():
     with open("D:/tmp/newstory/labeled_groups.txt") as fp:
         labeled = map(lambda x: x.strip(), fp.readlines())
 
-    for g, score in ((unlabeled, 1), (labeled, 10)):
-        for group in tqdm(g, leave=False):
-            pbar = tqdm(followers[group]["data"]["followers"], leave=False)
-
-            def send(profile):
-                profile_id = engine.scalar(
-                    """SELECT id from
-                                (SELECT ROW_NUMBER() OVER(PARTITION BY username ORDER BY created_date DESC) AS rn, * FROM fact_profiles) t
-                                    WHERE rn = 1 and username = ?""",
-                    [profile],
-                )
-                if profile_id:
-                    engine.execute(
-                        "INSERT INTO reports (resource, resource_id, details) VALUES (?,?,?)",
-                        ["profile", profile_id, json.dumps({"SCORE": score})],
-                    )
-                pbar.update()
-
-            list(pmap(send, followers[group]["data"]["followers"]))
+    all_labeled = tuple(
+        i
+        for sublist in [
+            followers.get(l, {}).get("data", {}).get("followers", []) for l in labeled
+        ]
+        for i in sublist
+    )
+    without_report = engine.execute(
+        """select count(*), username, profiles.id id
+    from (select row_number() over (partition by instagram_author_profile_id order by created_date desc) rn, *
+          from fact_posts) posts
+             left join fact_profiles profiles on instagram_author_profile_id = instagram_profile_id
+             left join reports on profiles.id = reports.resource_id
+    where rn = 1
+      AND resource is null
+      AND is_business_account = 0
+      AND is_private = 0
+      AND caption is not null
+    group by username, profiles.id;"""
+    )
+    users = [
+        ("profile", user.id, json.dumps({"SCORE": 10 if user in all_labeled else 0}))
+        for user in without_report
+    ]
+    engine.execute(
+        "INSERT INTO reports (resource, resource_id, details) VALUES (?,?,?)", *users
+    )
 
 
 if __name__ == "__main__":

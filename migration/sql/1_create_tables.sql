@@ -33,10 +33,14 @@ CREATE TABLE fact_posts
     PRIMARY KEY (instagram_post_id, created_date)
 );
 
+ALTER TABLE fact_posts
+    ADD CONSTRAINT ip_id unique (instagram_post_id);
+
 DROP TABLE IF EXISTS reports;
 CREATE TABLE reports
 (
     id           INT IDENTITY (1,1) PRIMARY KEY,
+    uuid         VARCHAR(36),
     resource     NVARCHAR(MAX),
     resource_id  INT,
     details      NVARCHAR(MAX),
