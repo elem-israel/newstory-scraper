@@ -1,7 +1,0 @@
-{
-  "ext": "ts,json",
-  "ignore": [
-    "src/**/*.spec.ts"
-  ],
-  "exec": "node -r ts-node/register -r dotenv/config src/index.ts"
-}
