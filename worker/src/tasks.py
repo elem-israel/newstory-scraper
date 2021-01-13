@@ -4,23 +4,23 @@ import os
 import logging
 
 from azure.storage.blob import BlobServiceClient
+import sqlalchemy as sa
 
-from . import producers
+from . import producer
 from .scraper import get_profile
-from .util import read_blob, get_bool_from_env
+from .sql_connectors import posts_to_sql, profile_to_sql
+from .util import extract_posts, extract_profile, read_blob
 
 logger = logging.getLogger(__name__)
 
+blob_service_client = BlobServiceClient.from_connection_string(
+    os.environ["AZURE_STORAGE_CONNECTION_STRING"]
+)
+engine = sa.create_engine(os.environ["DATABASE_CONNECTION_STRING"])
 
-if get_bool_from_env("WORKER", 0):
-    blob_service_client = BlobServiceClient.from_connection_string(
-        os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-    )
 
-
-def echo(event):
-    event_data = event.value
-    print(event_data)
+def echo(text):
+    logger.info(text)
 
 
 def scrape_profile(user) -> dict:
@@ -29,22 +29,28 @@ def scrape_profile(user) -> dict:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as fp:
         json.dump({"created_at": datetime.utcnow().isoformat(), "data": profile}, fp)
-    producers["newstory.tasks.upload"].send("newstory.tasks.upload", user, path).get(
-        timeout=60
-    )
+    producer.send("newstory.tasks.upload", user, path).get(timeout=60)
     return profile
 
 
 def insert_to_db(blob, container_name=None) -> dict:
+    logger.info(f"getting {blob}")
     data = read_blob(
         blob_service_client, container_name or os.environ["CONTAINER_NAME"], blob
     )
-    path = f"/tmp/profiles/{user}/profile.json"
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w") as fp:
-        json.dump({"created_at": datetime.utcnow().isoformat(), "data": profile}, fp)
-    upload.apply_async(args=[path])
-    return profile
+    parsed = json.loads(data)
+    logger.info("starting transaction")
+    try:
+        with engine.begin() as con:
+            logger.info("inserting profile")
+            profile = extract_profile(parsed)
+            profile_to_sql(con, profile)
+            logger.info("inserting posts")
+            posts = extract_posts(parsed)
+            posts_to_sql(con, posts)
+            logger.info("committing transaction")
+    except sa.exc.IntegrityError as err:
+        logger.info(f"Duplicate entry:\n{err}")
 
 
 def upload(path) -> str:
@@ -59,10 +65,5 @@ def upload(path) -> str:
     )
     with open(path, "rb") as data:
         blob_client.upload_blob(data, overwrite=True)
-    producers["newstory.tasks.newEntry"].send(
-        "newstory.tasks.newEntry", user, blob
-    ).get(timeout=60)
+    producer.send("newstory.tasks.newEntry", user, blob).get(timeout=60)
     return blob
-
-
-tasks = {"profile": scrape_profile, "Echo": echo}

@@ -16,32 +16,19 @@ services:
       - 3030:3000
     volumes:
       - ./web:/app
-  echo_worker:
+  worker:
     environment:
       - KAFKA_HOST=kafka
       - KAFKA_PORT=9093
       - AZURE_STORAGE_CONNECTION_STRING
+      - DATABASE_CONNECTION_STRING=${DOCKER_DATABASE_CONNECTION_STRING}
       - CONTAINER_NAME
-      - KAFKA_TOPICS=Echo
-      - KAFKA_TOPIC=Echo
+      - SQLALCHEMY_URL
+      - KAFKA_TOPICS_LISTENER=newstory.tasks.echo,newstory.tasks.newEntry
     build:
       context: worker
     depends_on:
       - kafka
-#  profile_worker:
-#    environment:
-#      - AZURE_STORAGE_CONNECTION_STRING
-#      - CONTAINER_NAME
-#      - PROXY_USER
-#      - PROXY_PASSWORD
-#      - PROXY_HOST
-#      - PROXY_PORT
-#    build:
-#      context: worker
-#    volumes:
-#      - C:/tmp/newstory/profiles:/tmp/profiles
-#    depends_on:
-#      - kafka
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
@@ -49,16 +36,16 @@ services:
   kafka:
     image: wurstmeister/kafka:2.12-2.5.0
     ports:
-     - "9092:9092"
+      - "9092:9092"
     expose:
-     - "9093"
+      - "9093"
     environment:
       KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "Echo:1:1"
+      KAFKA_CREATE_TOPICS: newstory.tasks.newEntry:10:1,newstory.tasks.echo:10:1,newstory.tasks.upload:10:1,newstory.deadLetter:1:1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

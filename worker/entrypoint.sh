@@ -1,2 +1,2 @@
 #!/bin/bash
-python3 -m consumer "$KAFKA_TOPIC"
+python3 -m consumer

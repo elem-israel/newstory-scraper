@@ -1,6 +1,6 @@
 import os
-from random import random
 
+import pandas as pd
 from dotenv import load_dotenv
 from azure.storage.blob import BlobServiceClient
 import requests
@@ -18,25 +18,16 @@ batch = 500
 
 
 def main():
-    with open("D:/tmp/newstory/youth.txt", "r") as fp:
-        profiles = fp.readlines()
-    with open("D:/tmp/newstory/labeled_youth.txt", "r") as fp:
-        profiles += fp.readlines()
-    profiles = [p.strip() for p in profiles]
-    existing = list(
-        b.name.split("/")[-2]
-        for b in blob_service_client.get_container_client(container_name).list_blobs(
-            name_starts_with="profiles/"
-        )
-    )
-    to_scrape = list(set(profiles) - set(existing))
-    assert len(profiles) > len(to_scrape)
-    for user in to_scrape:
-        print(f"sending {user}")
-        res = requests.post(
-            f"http://localhost:3030/queue/tasks.profile", json={"args": [user]}
-        )
-        res.raise_for_status()
+    for d in pd.date_range("2020-09-01", "2020-11-30", freq="D"):
+        for blob in blob_service_client.get_container_client(container_name).list_blobs(
+            name_starts_with=f"profiles/{d.strftime('%Y-%m-%d')}"
+        ):
+            print(f"sending {blob.name}")
+            res = requests.post(
+                f"http://localhost:3030/queue/newstory.tasks.newEntry",
+                json={"message": blob.name},
+            )
+            res.raise_for_status()
 
 
 if __name__ == "__main__":

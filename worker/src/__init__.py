@@ -1,16 +1,17 @@
 import json
 import os
-from typing import Dict
 
 from kafka import KafkaConsumer, KafkaProducer
 
 config = {
     "consumer": {
         "default": {
-            "auto_offset_reset": "earliest",
+            "auto_offset_reset": "latest",
             "enable_auto_commit": True,
-            "group_id": "my-group-id",
+            "group_id": os.getenv("KAFKA_GROUP_ID", "newstory-kafka-worker"),
             "value_deserializer": lambda x: json.loads(x.decode("utf-8")),
+            "session_timeout_ms": 60000,
+            "heartbeat_interval_ms": 10000,
         }
     },
     "producer": {
@@ -18,25 +19,20 @@ config = {
     },
 }
 
-consumers: Dict[str, KafkaConsumer] = {
-    topic: KafkaConsumer(
-        topic,
+
+def get_consumer():
+    return KafkaConsumer(
+        *os.environ["KAFKA_TOPICS_LISTENER"].split(","),
         bootstrap_servers=[
             f'{os.getenv("KAFKA_HOST", "localhost")}:{os.getenv("KAFKA_PORT", "9092")}'
         ],
         **config["consumer"]["default"],
-        **config["consumer"].get(topic, {}),
     )
-    for topic in os.environ["KAFKA_TOPICS"].split(",")
-}
 
-producers: Dict[str, KafkaProducer] = {
-    topic: KafkaProducer(
-        bootstrap_servers=[
-            f'{os.getenv("KAFKA_HOST", "localhost")}:{os.getenv("KAFKA_PORT", "9092")}'
-        ],
-        **config["producer"]["default"],
-        **config["producer"].get(topic, {}),
-    )
-    for topic in os.environ["KAFKA_TOPICS"].split(",")
-}
+
+producer = KafkaProducer(
+    bootstrap_servers=[
+        f'{os.getenv("KAFKA_HOST", "localhost")}:{os.getenv("KAFKA_PORT", "9092")}'
+    ],
+    **config["producer"]["default"],
+)
