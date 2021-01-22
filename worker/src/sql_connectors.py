@@ -30,6 +30,15 @@ def profile_to_sql(connection, profile):
     )
 
 
+def tags_to_sql(connection, tags):
+    for t in tags:
+        connection.execute(
+            *dict_to_sql(
+                "fact_hashtags", t, ("instagram_post_id", "tag", "created_date"),
+            )
+        )
+
+
 def posts_to_sql(connection, posts):
     for p in posts:
         connection.execute(

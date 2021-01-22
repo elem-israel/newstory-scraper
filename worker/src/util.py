@@ -70,7 +70,7 @@ def extract_posts(dictionary):
     return posts
 
 
-def extract_hashtags(dictionary):
+def extract_tags(dictionary):
     posts = get_from_list(
         extract_jsonpath("$.data.GraphImages", dictionary), default=[]
     )
