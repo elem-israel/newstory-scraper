@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from worker.src.util import extract_profile, extract_posts
+from worker.src.util import extract_profile, extract_posts, extract_hashtags
 
 
 def test_extract_profile(profile):
@@ -22,8 +22,16 @@ def test_extract_profile(profile):
 
 def test_extract_posts(profile):
     extracted = extract_posts(profile)
-    isinstance(extracted[0]["instagram_post_id"], str)
-    isinstance(extracted[0]["caption"], str)
-    isinstance(extracted[0]["taken_at"], datetime)
+    assert isinstance(extracted[0]["instagram_post_id"], str)
+    assert isinstance(extracted[0]["caption"], str)
+    assert isinstance(extracted[0]["taken_at"], datetime)
     assert extracted[0]["instagram_author_profile_id"] == "11472474315"
     assert len(extracted) == 42
+
+
+def test_extract_hashtags(profile):
+    extracted = extract_hashtags(profile)
+    for t in extracted:
+        assert isinstance(t["instagram_post_id"], str)
+        assert isinstance(t["tag"], str)
+    assert len(extracted) == 543
