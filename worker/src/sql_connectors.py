@@ -34,7 +34,7 @@ def tags_to_sql(connection, tags):
     for t in tags:
         connection.execute(
             *dict_to_sql(
-                "fact_hashtags", t, ("instagram_post_id", "tag", "created_date"),
+                "fact_tags", t, ("instagram_post_id", "tag"),
             )
         )
 
