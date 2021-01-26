@@ -70,6 +70,27 @@ def extract_posts(dictionary):
     return posts
 
 
+def extract_tags(dictionary):
+    posts = get_from_list(
+        extract_jsonpath("$.data.GraphImages", dictionary), default=[]
+    )
+    posts = [
+        {
+            "instagram_post_id": post["id"],
+            "tags": get_from_list(extract_jsonpath("$.tags", post)),
+        }
+        for post in posts
+    ]
+    # post = {instagram_post_id: 123, tags: [tag1, tags2....]}
+    tags = [
+        [{"instagram_post_id": p["instagram_post_id"], "tag": t} for t in p["tags"]]
+        for p in posts
+        if p["tags"]
+    ]
+    # tag = [{instagram_post_id: 123, tag: tag1}, ....]
+    return [i for j in tags for i in j]
+
+
 def extract_jsonpath(expression, dictionary):
     jsonpath_expr = jsonpath_ng.parse(expression)
     return [v.value for v in jsonpath_expr.find(dictionary)]
