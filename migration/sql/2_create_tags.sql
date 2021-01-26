@@ -3,7 +3,7 @@ CREATE TABLE fact_tags
 (
   id                INT IDENTITY (1,1) UNIQUE,
   instagram_post_id VARCHAR(256),
-  tag               NVARCHAR(1024),
+  tag               NVARCHAR(256),
   created_date      DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 );
