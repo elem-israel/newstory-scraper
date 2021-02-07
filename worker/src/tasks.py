@@ -57,8 +57,16 @@ def upload(path) -> str:
     container_name = os.environ["CONTAINER_NAME"]
     with open(path, "r") as fp:
         profile = json.load(fp)
-    date = datetime.fromisoformat(profile["created_at"]).isoformat().split("T")[0]
+    date = datetime.fromisoformat(
+        profile["created_at"]).isoformat().split("T")[0]
     user = profile["data"]["GraphProfileInfo"]["username"]
+    posts = extract_posts(profile)
+    for post in posts:
+        for i, photo in enumerate(post["photos"]):
+            blob_client = blob_service_client.get_blob_client(
+                container=container_name, blob=f"profiles/{date}/{user}/{post['instagram_post_id']}_{i+1}.jpg"
+            )
+            blob_client.upload_blob_from_url(photo)
     blob = f"profiles/{date}/{user}/profile.json"
     blob_client = blob_service_client.get_blob_client(
         container=container_name, blob=blob
