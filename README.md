@@ -10,7 +10,8 @@ git clone https://github.com/mattkohl/docker-flask-celery-redis
 
 ### Local
 ```shell
-
+pip install -r requirements.txt
+python -m entrypoint.py
 ```
 
 ### Build & Launch
@@ -34,7 +35,7 @@ docker-compose down
 
 To change the endpoints, update the code in [api/app.py](api/src/app.py)
 
-Task changes should happen in [queue/tasks.py](src/main.py) 
+Task changes should happen in [queue/tasks.py](main.py) 
 
 ---
 

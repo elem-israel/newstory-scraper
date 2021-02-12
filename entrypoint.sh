@@ -1,2 +1,2 @@
 #!/bin/bash
-python3 -m consumer
+python3 -m consumer "$@"
