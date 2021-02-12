@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from worker.src.util import extract_profile, extract_posts, extract_tags
+from util import extract_profile, extract_posts, extract_tags
 
 
 def test_extract_profile(profile):

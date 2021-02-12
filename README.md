@@ -8,6 +8,11 @@ A basic [Docker Compose](https://docs.docker.com/compose/) template for orchestr
 git clone https://github.com/mattkohl/docker-flask-celery-redis
 ```
 
+### Local
+```shell
+
+```
+
 ### Build & Launch
 
 ```bash
@@ -29,7 +34,7 @@ docker-compose down
 
 To change the endpoints, update the code in [api/app.py](api/src/app.py)
 
-Task changes should happen in [queue/tasks.py](worker/src/main.py) 
+Task changes should happen in [queue/tasks.py](src/main.py) 
 
 ---
 

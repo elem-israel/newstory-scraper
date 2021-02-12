@@ -5,7 +5,7 @@ import sqlalchemy as sa
 from dotenv import load_dotenv
 
 load_dotenv()
-from worker.src.util import extract_profile
+from util import extract_profile
 
 
 engine = sa.create_engine(os.environ["SQLALCHEMY_URL"])
