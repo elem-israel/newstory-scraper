@@ -3,19 +3,30 @@ import os
 
 from kafka import KafkaConsumer, KafkaProducer
 
+
+def deserializer(message):
+    try:
+        return json.loads(message.decode("utf-8"))
+    except json.decoder.JSONDecodeError:
+        return message
+
+
 config = {
     "consumer": {
         "default": {
             "auto_offset_reset": "latest",
             "enable_auto_commit": True,
-            "group_id": os.getenv("KAFKA_GROUP_ID", "newstory-kafka-worker"),
-            "value_deserializer": lambda x: json.loads(x.decode("utf-8")),
+            "group_id": os.getenv("KAFKA_GROUP_ID", "default"),
+            "value_deserializer": deserializer,
             "session_timeout_ms": 60000,
             "heartbeat_interval_ms": 10000,
+            "security_protocol": "PLAINTEXT",
         }
     },
     "producer": {
-        "default": {"value_serializer": lambda x: json.dumps(x).encode("utf-8")}
+        "default": {
+            "value_serializer": lambda x: json.dumps(x).encode("utf-8"),
+        }
     },
 }
 
@@ -30,9 +41,10 @@ def get_consumer():
     )
 
 
-producer = KafkaProducer(
-    bootstrap_servers=[
-        f'{os.getenv("KAFKA_HOST", "localhost")}:{os.getenv("KAFKA_PORT", "9092")}'
-    ],
-    **config["producer"]["default"],
-)
+def get_producer():
+    return KafkaProducer(
+        bootstrap_servers=[
+            f'{os.getenv("KAFKA_HOST", "localhost")}:{os.getenv("KAFKA_PORT", "9092")}'
+        ],
+        **config["producer"]["default"],
+    )

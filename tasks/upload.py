@@ -5,13 +5,16 @@ import os
 
 from azure.storage.blob import BlobServiceClient
 
-from kafka_config import producer
+from kafka_config import get_producer
 
 logger = logging.getLogger(__name__)
 
-blob_service_client = BlobServiceClient.from_connection_string(
-    os.environ["AZURE_STORAGE_CONNECTION_STRING"]
-)
+if os.getenv("AZURE_STORAGE_CONNECTION_STRING"):
+    blob_service_client = BlobServiceClient.from_connection_string(
+        os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+    )
+else:
+    logger.warning("AZURE_STORAGE_CONNECTION_STRING is not defined")
 
 
 def upload(path) -> str:
@@ -26,5 +29,5 @@ def upload(path) -> str:
     )
     with open(path, "rb") as data:
         blob_client.upload_blob(data, overwrite=True)
-    producer.send("newstory.tasks.newEntry", user, blob).get(timeout=60)
+    get_producer().send("newstory.tasks.newEntry", user, blob).get(timeout=60)
     return blob

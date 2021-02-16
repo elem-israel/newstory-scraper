@@ -4,7 +4,7 @@ import sys
 from time import sleep
 import traceback
 
-from main import main
+from consume import main
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 

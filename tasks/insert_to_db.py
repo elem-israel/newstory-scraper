@@ -10,10 +10,17 @@ from util import extract_posts, extract_profile, read_blob
 
 logger = logging.getLogger(__name__)
 
-blob_service_client = BlobServiceClient.from_connection_string(
-    os.environ["AZURE_STORAGE_CONNECTION_STRING"]
-)
-engine = sa.create_engine(os.environ["DATABASE_CONNECTION_STRING"])
+if os.getenv("AZURE_STORAGE_CONNECTION_STRING"):
+    blob_service_client = BlobServiceClient.from_connection_string(
+        os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+    )
+else:
+    logger.warning("AZURE_STORAGE_CONNECTION_STRING is not defined")
+if os.getenv("DATABASE_CONNECTION_STRING"):
+    engine = sa.create_engine(os.environ["DATABASE_CONNECTION_STRING"])
+else:
+    logger.warning("DATABASE_CONNECTION_STRING is not defined")
+
 
 
 def insert_to_db(blob, container_name=None) -> dict:
