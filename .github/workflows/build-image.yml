@@ -1,0 +1,39 @@
+name: Docker Flask Celery Redis
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@master
+        with:
+          ref: master
+
+      - name: 'Login via Azure CLI'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - uses: azure/docker-login@v1
+        with:
+          login-server: newstorycontainerregistry.azurecr.io
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - uses: satackey/action-docker-layer-caching@v0.0.8
+        continue-on-error: true
+
+      - run: |
+          docker build . -t newstorycontainerregistry.azurecr.io/worker:${{ github.sha }}
+          docker tag newstorycontainerregistry.azurecr.io/worker:${{ github.sha }} newstorycontainerregistry.azurecr.io/api:latest
+          docker push newstorycontainerregistry.azurecr.io/worker:${{ github.sha }}
+          docker push newstorycontainerregistry.azurecr.io/worker:latest
+
+      - name: Azure logout
+        run: |
+          az logout
