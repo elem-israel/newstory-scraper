@@ -31,20 +31,16 @@ config = {
 }
 
 
-def get_consumer():
+def get_consumer(topics, bootstrap_servers):
     return KafkaConsumer(
-        *os.environ["KAFKA_TOPICS_LISTENER"].split(","),
-        bootstrap_servers=[
-            f'{os.getenv("KAFKA_HOST", "localhost")}:{os.getenv("KAFKA_PORT", "9092")}'
-        ],
+        *topics,
+        bootstrap_servers=bootstrap_servers,
         **config["consumer"]["default"],
     )
 
 
-def get_producer():
+def get_producer(bootstrap_servers):
     return KafkaProducer(
-        bootstrap_servers=[
-            f'{os.getenv("KAFKA_HOST", "localhost")}:{os.getenv("KAFKA_PORT", "9092")}'
-        ],
+        bootstrap_servers=bootstrap_servers,
         **config["producer"]["default"],
     )

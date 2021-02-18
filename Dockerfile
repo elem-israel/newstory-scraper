@@ -58,9 +58,8 @@ WORKDIR /usr/src/app
 COPY requirements.txt /usr/src/app/
 RUN pip install -r requirements.txt
 
-COPY src /usr/src/app/src/
-COPY entrypoint.sh /usr/src/app/
-COPY consumer.py /usr/src/app/
+ADD src /usr/src/app/
+COPY scripts/entrypoint.sh /usr/src/app/
 RUN chmod 755 /usr/src/app/entrypoint.sh
 
 ENTRYPOINT  ./entrypoint.sh
