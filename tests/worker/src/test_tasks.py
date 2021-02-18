@@ -27,7 +27,7 @@ def test_insert_to_db(profile):
         followers_count,
         following_count,
         full_name,
-        created_date)                 
+        created_date)
         VALUES (?,?,?,?,?,?,?,?,?,?,?)
         """,
         [

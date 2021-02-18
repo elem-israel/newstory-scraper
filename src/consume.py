@@ -6,17 +6,18 @@ from time import sleep
 
 import kafka.errors
 
+import json_logging
 from kafka_config import get_consumer, get_producer
-from tasks import echo, insert_to_db, upload
-
+from tasks import echo, insert_to_db, upload, scrape_profile
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = json_logging.getLogger(__name__)
 
 topic_to_task = {
     "newstory.tasks.newEntry": insert_to_db.insert_to_db,
     "newstory.tasks.echo": echo.echo,
     "newstory.tasks.upload": upload.upload,
+    "newstory.tasks.scrape": scrape_profile.scrape_profile,
 }
 
 
