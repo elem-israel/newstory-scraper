@@ -23,7 +23,7 @@ def upload(path) -> str:
         profile = json.load(fp)
     date = datetime.fromisoformat(profile["created_at"]).isoformat().split("T")[0]
     user = profile["data"]["GraphProfileInfo"]["username"]
-    blob = f"profiles/{date}/{user}/profile.json"
+    blob = "/".join(["profiles", date, user, "profile.json"])
     blob_client = blob_service_client.get_blob_client(
         container=container_name, blob=blob
     )

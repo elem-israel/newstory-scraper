@@ -22,7 +22,6 @@ else:
     logger.warning("DATABASE_CONNECTION_STRING is not defined")
 
 
-
 def insert_to_db(blob, container_name=None) -> dict:
     logger.info(f"getting {blob}")
     data = read_blob(
