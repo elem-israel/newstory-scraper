@@ -5,7 +5,7 @@ import os
 
 from azure.storage.blob import BlobServiceClient
 
-from kafka_config import producer
+from kafka_config import get_producer
 from scraper import get_profile
 
 logger = logging.getLogger(__name__)
@@ -23,5 +23,5 @@ def scrape_profile(user) -> dict:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as fp:
         json.dump({"created_at": datetime.utcnow().isoformat(), "data": profile}, fp)
-    producer.send("newstory.tasks.upload", user, path).get(timeout=60)
+    get_producer().send("newstory.tasks.upload", user, path).get(timeout=60)
     return profile
