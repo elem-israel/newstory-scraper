@@ -2,18 +2,13 @@ import json
 import logging
 import os
 
-from azure.storage.blob import BlobServiceClient
 import sqlalchemy as sa
 
 from sql_connectors import tags_to_sql
+from . import blob_service_client, engine
 from util import read_blob, extract_tags
 
 logger = logging.getLogger(__name__)
-
-blob_service_client = BlobServiceClient.from_connection_string(
-    os.environ["AZURE_STORAGE_CONNECTION_STRING"]
-)
-engine = sa.create_engine(os.environ["DATABASE_CONNECTION_STRING"])
 
 
 def insert_tags_to_db(blob, container_name=None) -> dict:

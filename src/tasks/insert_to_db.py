@@ -2,24 +2,13 @@ import json
 import logging
 import os
 
-from azure.storage.blob import BlobServiceClient
 import sqlalchemy as sa
 
 from sql_connectors import posts_to_sql, profile_to_sql
 from util import extract_posts, extract_profile, read_blob
+from . import blob_service_client, engine
 
 logger = logging.getLogger(__name__)
-
-if os.getenv("AZURE_STORAGE_CONNECTION_STRING"):
-    blob_service_client = BlobServiceClient.from_connection_string(
-        os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-    )
-else:
-    logger.warning("AZURE_STORAGE_CONNECTION_STRING is not defined")
-if os.getenv("DATABASE_CONNECTION_STRING"):
-    engine = sa.create_engine(os.environ["DATABASE_CONNECTION_STRING"])
-else:
-    logger.warning("DATABASE_CONNECTION_STRING is not defined")
 
 
 def insert_to_db(blob, container_name=None) -> dict:
