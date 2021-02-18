@@ -6,7 +6,7 @@ from decimal import Decimal
 from pythonjsonlogger import jsonlogger
 
 
-def EncodeDecimal(o):
+def encode(o):
     if isinstance(o, Decimal):
         return float(round(float(o), 8))
     if isinstance(o, datetime):
@@ -18,7 +18,7 @@ def getLogger(*args, **kwargs):
     logger = logging.getLogger(*args, **kwargs)
     handler = logging.StreamHandler(sys.stdout)
     formatter = jsonlogger.JsonFormatter(
-        "%(levelname)s %(name)s %(message)s", json_default=EncodeDecimal, timestamp=True
+        "%(levelname)s %(name)s %(message)s", json_default=encode, timestamp=True
     )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
