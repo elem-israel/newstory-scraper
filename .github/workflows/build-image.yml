@@ -30,7 +30,7 @@ jobs:
 
       - run: |
           docker build . -t newstorycontainerregistry.azurecr.io/worker:${{ github.sha }}
-          docker tag newstorycontainerregistry.azurecr.io/worker:${{ github.sha }} newstorycontainerregistry.azurecr.io/api:latest
+          docker tag newstorycontainerregistry.azurecr.io/worker:${{ github.sha }} newstorycontainerregistry.azurecr.io/worker:latest
           docker push newstorycontainerregistry.azurecr.io/worker:${{ github.sha }}
           docker push newstorycontainerregistry.azurecr.io/worker:latest
 
