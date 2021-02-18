@@ -1,4 +1,4 @@
-name: Docker Flask Celery Redis
+name: Build Docker Image
 
 on:
   push:
