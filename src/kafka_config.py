@@ -18,6 +18,7 @@ config = {
             "enable_auto_commit": True,
             "group_id": os.getenv("KAFKA_GROUP_ID", "default"),
             "value_deserializer": deserializer,
+            "key_deserializer": lambda x: x.decode("utf-8"),
             "session_timeout_ms": 60000,
             "heartbeat_interval_ms": 10000,
             "security_protocol": "PLAINTEXT",
