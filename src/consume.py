@@ -18,7 +18,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 topic_to_task = {
-    "newstory.tasks.newEntry": insert_to_db.insert_to_db,
+    "newstory.tasks.newentry": insert_to_db.insert_to_db,
     "newstory.tasks.echo": echo.echo,
     "newstory.tasks.upload": upload.upload,
     "newstory.tasks.scrape": scrape_profile.scrape_profile,
