@@ -18,5 +18,7 @@ bootstrap_servers = [
 ]
 
 if __name__ == "__main__":
-    f = get_producer(bootstrap_servers).send(sys.argv[1], sys.argv[2])
+    f = get_producer(bootstrap_servers).send(
+        topic=sys.argv[1], key=sys.argv[2], value=sys.argv[3]
+    )
     print(f.get(timeout=10))

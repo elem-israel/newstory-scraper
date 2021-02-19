@@ -4,11 +4,18 @@ import os
 from kafka import KafkaConsumer, KafkaProducer
 
 
-def deserializer(message):
+def value_deserializer(message):
     try:
         return json.loads(message.decode("utf-8"))
     except json.decoder.JSONDecodeError:
         return message
+
+
+def key_deserializer(key):
+    try:
+        return key.decode("utf-8")
+    except AttributeError:
+        return key
 
 
 config = {
@@ -17,8 +24,8 @@ config = {
             "auto_offset_reset": "latest",
             "enable_auto_commit": True,
             "group_id": os.getenv("KAFKA_GROUP_ID", "default"),
-            "value_deserializer": deserializer,
-            "key_deserializer": lambda x: x.decode("utf-8"),
+            "value_deserializer": value_deserializer,
+            "key_deserializer": key_deserializer,
             "session_timeout_ms": 60000,
             "heartbeat_interval_ms": 10000,
             "security_protocol": "PLAINTEXT",
