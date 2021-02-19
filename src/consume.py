@@ -42,7 +42,7 @@ def main():
                 except:
                     logger.error(traceback.format_exc())
                     producer.send(
-                        "newstory.deadLetter",
+                        "newstory.deadletter",
                         value={"event": event, "stack": traceback.format_exc()},
                     )
         except kafka.errors.NoBrokersAvailable as e:
