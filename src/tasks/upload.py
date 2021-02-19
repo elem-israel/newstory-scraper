@@ -21,7 +21,7 @@ def upload(path) -> str:
     )
     with open(path, "rb") as data:
         blob_client.upload_blob(data, overwrite=True)
-    get_producer(bootstrap_servers).send("newstory.tasks.newentry", user, blob).get(
-        timeout=60
-    )
+    get_producer(bootstrap_servers).send(
+        topic="newstory.tasks.newentry", key=user, value=blob
+    ).get(timeout=60)
     return blob

@@ -26,6 +26,7 @@ config = {
     "producer": {
         "default": {
             "value_serializer": lambda x: json.dumps(x).encode("utf-8"),
+            "key_serializer": lambda x: x.encode("utf-8"),
         }
     },
 }

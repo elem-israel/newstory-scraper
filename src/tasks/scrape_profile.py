@@ -17,6 +17,6 @@ def scrape_profile(user: str) -> dict:
     with open(path, "w") as fp:
         json.dump({"created_at": datetime.utcnow().isoformat(), "data": profile}, fp)
     get_producer(bootstrap_servers).send(
-        topic="newstory.tasks.upload", key=user.encode(), value=path
+        topic="newstory.tasks.upload", key=user, value=path
     ).get(timeout=60)
     return profile
