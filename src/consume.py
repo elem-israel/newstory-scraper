@@ -46,7 +46,7 @@ def main():
                 except:
                     logger.error(traceback.format_exc())
                     producer.send(
-                        "newstory.deadletter",
+                        topic="newstory.deadletter",
                         key="event.topic",
                         value={"event": event, "stack": traceback.format_exc()},
                     )
