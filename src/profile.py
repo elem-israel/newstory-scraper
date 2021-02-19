@@ -51,7 +51,7 @@ def main(users, input_file, out_dir):
                     {"created_at": datetime.utcnow().isoformat(), "data": profile}, fp
                 )
         else:
-            print(json.dumps(profile, 2))
+            print(json.dumps(profile, indent=2))
 
 
 if __name__ == "__main__":
