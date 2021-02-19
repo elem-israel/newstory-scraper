@@ -14,7 +14,7 @@ def encode(o):
     raise TypeError(repr(o) + " is not JSON serializable")
 
 
-def getLogger(*args, **kwargs):
+def init_logger(*args, **kwargs):
     logger = logging.getLogger(*args, **kwargs)
     handler = logging.StreamHandler(sys.stdout)
     formatter = jsonlogger.JsonFormatter(
@@ -23,4 +23,4 @@ def getLogger(*args, **kwargs):
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
-    return logger
+    logging.getLogger().addHandler(handler)
