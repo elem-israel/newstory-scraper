@@ -20,4 +20,4 @@ except KeyError:
 bootstrap_servers = [
     f'{os.getenv("KAFKA_HOST", "localhost")}:{os.getenv("KAFKA_PORT", "9092")}'
 ]
-profile_storage_path = os.getenv("PROFILE_STORAGE_PATH", "/tmp/scraper")
+profile_storage_path = os.getenv("PROFILE_STORAGE_PATH", "/tmp")
