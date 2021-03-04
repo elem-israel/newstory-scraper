@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 @click.command()
 @click.argument("users", required=False)
 @click.option("--file", "input_file", type=click.File("r"))
-@click.option("--out", "out_dir", type=click.Path(), default="output")
+@click.option("-o", "--out", "out_dir", type=click.Path(), default="output")
 @click.option("--max-followers", type=int)
 @click.option("--cloud/--no-cloud", default=False)
 def main(users, input_file, out_dir, max_followers, cloud):

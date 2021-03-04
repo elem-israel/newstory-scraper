@@ -2,7 +2,7 @@ Babel==2.5.3
 azure-storage-blob==12.5.0
 billiard==3.6.3.0
 instagram-scraper==1.9.1
-instapy==0.6.11
+instapy==0.6.13
 jsonpath-ng==1.5.2
 kafka-python==2.0.2
 numpy==1.19.4
