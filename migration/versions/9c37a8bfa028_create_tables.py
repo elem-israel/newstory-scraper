@@ -1,7 +1,7 @@
 """create tables
 
 Revision ID: 9c37a8bfa028
-Revises: 
+Revises:
 Create Date: 2020-11-25 11:02:45.635372
 
 """

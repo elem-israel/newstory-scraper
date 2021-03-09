@@ -5,7 +5,7 @@ import sqlalchemy as sa
 from dotenv import load_dotenv
 
 load_dotenv()
-from worker.src.util import extract_profile
+from util import extract_profile
 
 
 engine = sa.create_engine(os.environ["SQLALCHEMY_URL"])
@@ -27,7 +27,7 @@ def test_insert_to_db(profile):
         followers_count,
         following_count,
         full_name,
-        created_date)                 
+        created_date)
         VALUES (?,?,?,?,?,?,?,?,?,?,?)
         """,
         [

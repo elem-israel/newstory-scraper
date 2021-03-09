@@ -1,21 +1,5 @@
-version: "3"
+version: "3.8"
 services:
-  web:
-    tty: true # Enables debugging capabilities when attached to this container.
-    image: 'docker.io/bitnami/express:4-debian-10'
-    command: npm run dev-docker
-    environment:
-      - KAFKA_HOST=kafka
-      - KAFKA_PORT=9093
-      - PORT=3000
-      - NODE_ENV=development
-      - SKIP_NPM_INSTALL=0
-      - AZURE_STORAGE_CONNECTION_STRING
-      - CONTAINER_NAME
-    ports:
-      - 3030:3000
-    volumes:
-      - ./web:/app
   worker:
     environment:
       - KAFKA_HOST=kafka
@@ -26,9 +10,10 @@ services:
       - SQLALCHEMY_URL
       - KAFKA_TOPICS_LISTENER=newstory.tasks.echo,newstory.tasks.newEntry
     build:
-      context: worker
+      context: .
     depends_on:
       - kafka
+      - zookeeper
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
@@ -47,11 +32,14 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPICS: newstory.tasks.newEntry:10:1,newstory.tasks.echo:10:1,newstory.tasks.upload:10:1,newstory.deadLetter:1:1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-  magic:
-    image: digitsy/kafka-magic
+  kafdrop:
+    image: "obsidiandynamics/kafdrop:3.27.0"
     ports:
-      - "8080:80"
+      - "9000:9000"
     environment:
-      KMAGIC_ALLOW_TOPIC_DELETE: "true"
+      KAFKA_BROKERCONNECT: "kafka:9093"
+      JVM_OPTS: "-Xms32M -Xmx64M"
+      SERVER_SERVLET_CONTEXTPATH: "/"
+    depends_on:
+      - kafka
+      - zookeeper

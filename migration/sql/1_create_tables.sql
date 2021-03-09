@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS fact_profiles;
+-- DROP TABLE IF EXISTS fact_profiles;
 CREATE TABLE fact_profiles
 (
     id                   INT IDENTITY (1,1) UNIQUE,
@@ -20,7 +20,7 @@ CREATE TABLE fact_profiles
 ALTER TABLE fact_profiles
     ADD CONSTRAINT u_id unique (id);
 
-DROP TABLE IF EXISTS fact_posts;
+-- DROP TABLE IF EXISTS fact_posts;
 CREATE TABLE fact_posts
 (
     id                          INT IDENTITY (1,1) UNIQUE,
@@ -36,7 +36,7 @@ CREATE TABLE fact_posts
 ALTER TABLE fact_posts
     ADD CONSTRAINT ip_id unique (instagram_post_id);
 
-DROP TABLE IF EXISTS reports;
+-- DROP TABLE IF EXISTS reports;
 CREATE TABLE reports
 (
     id           INT IDENTITY (1,1) PRIMARY KEY,

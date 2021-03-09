@@ -36,6 +36,7 @@ RUN set -x \
     build-essential \
     locales \
     apt-transport-https \
+    vim \
 # Microsoft SQL Server Prerequisites
     && cd /tmp \
     && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
@@ -51,6 +52,7 @@ RUN set -x \
     && mv -f /tmp/temp.ini /etc/odbcinst.ini \
     && pip install pyodbc==4.0.30 \
     && apt-get purge -y --auto-remove build-essential \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/*
 
@@ -58,9 +60,8 @@ WORKDIR /usr/src/app
 COPY requirements.txt /usr/src/app/
 RUN pip install -r requirements.txt
 
-COPY src /usr/src/app/src/
-COPY entrypoint.sh /usr/src/app/
-COPY consumer.py /usr/src/app/
+ADD src /usr/src/app/
+COPY scripts/entrypoint.sh /usr/src/app/
 RUN chmod 755 /usr/src/app/entrypoint.sh
 
 ENTRYPOINT  ./entrypoint.sh
