@@ -3,12 +3,12 @@ import json
 import os
 import logging
 
-from azure.storage.blob import BlobServiceClient
+from azure.storage.blob import BlobServiceClient, upload_blob_to_url
 import sqlalchemy as sa
 
 from . import producer
 from .scraper import get_profile
-from .sql_connectors import posts_to_sql, profile_to_sql
+from .sql_connectors import posts_to_sql, profile_to_sql, photos_to_sql
 from .util import extract_posts, extract_profile, read_blob
 
 logger = logging.getLogger(__name__)
@@ -47,7 +47,15 @@ def insert_to_db(blob, container_name=None) -> dict:
             profile_to_sql(con, profile)
             logger.info("inserting posts")
             posts = extract_posts(parsed)
-            posts_to_sql(con, posts)
+            logger.info("inserting photos")
+            date = profile["created_date"].isoformat().split("T")[0]
+            user = profile["username"]
+            photos=[]
+            for post in posts:
+                photos += [{"username": user, "photo_path": f"/profiles/{date}/{user}/{post['instagram_post_id']}_{i+1}.jpg",
+                           "post_id": post["instagram_post_id"]} for i in range(len(post["photos"]))]
+            photos_to_sql(con, photos)
+            print("Done ", path)
             logger.info("committing transaction")
     except sa.exc.IntegrityError as err:
         logger.info(f"Duplicate entry:\n{err}")
@@ -63,10 +71,10 @@ def upload(path) -> str:
     posts = extract_posts(profile)
     for post in posts:
         for i, photo in enumerate(post["photos"]):
-            blob_client = blob_service_client.get_blob_client(
-                container=container_name, blob=f"profiles/{date}/{user}/{post['instagram_post_id']}_{i+1}.jpg"
-            )
-            blob_client.upload_blob_from_url(photo)
+                blob_client = blob_service_client.get_blob_client(
+                    container=container_name, blob=f"profiles/{date}/{user}/{post['instagram_post_id']}_{i+1}.jpg"
+                )
+                blob_client.upload_blob_from_url(photo, overwrite=True)
     blob = f"profiles/{date}/{user}/profile.json"
     blob_client = blob_service_client.get_blob_client(
         container=container_name, blob=blob
