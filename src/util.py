@@ -65,6 +65,7 @@ def extract_posts(dictionary):
                 extract_jsonpath("$.edge_media_to_caption.edges..node.text", post)
             ),
             "likes_count": extract_jsonpath("$.edge_media_preview_like.count", post)[0],
+            "photos": extract_jsonpath("$.urls", post)[0],
         }
         for post in posts
     ]

@@ -57,3 +57,17 @@ def posts_to_sql(connection, posts):
                 ),
             )
         )
+
+def photos_to_sql(connection, photos):
+    for p in photos:
+        connection.execute(
+            *dict_to_sql(
+                "fact_photos",
+                p,
+                (
+                    "photo_path",
+                    "post_id",
+                    "username"
+                ),
+            )
+        )
