@@ -1,7 +1,13 @@
+import logging
 import os
 from datetime import datetime
+from typing import Union
 
 import jsonpath_ng
+import requests
+
+
+logger = logging.getLogger(__name__)
 
 
 def read_blob(client, container_name, blob):
@@ -12,7 +18,12 @@ def read_blob(client, container_name, blob):
 
 
 def get_bool_from_env(key):
-    return os.getenv(key) in ["True", "true", "1", "yes"]
+    if os.getenv(key) in ["True", "true", "1", "yes"]:
+        return True
+    elif os.getenv(key) in ["False", "false", "0", "no"]:
+        return False
+    else:
+        return None
 
 
 def extract_profile(dictionary):
@@ -96,3 +107,18 @@ def extract_tags(dictionary):
 def extract_jsonpath(expression, dictionary):
     jsonpath_expr = jsonpath_ng.parse(expression)
     return [v.value for v in jsonpath_expr.find(dictionary)]
+
+
+def get_username_by_id(id: Union[str, int]):
+    url = f"https://i.instagram.com/api/v1/users/{id}/info/"
+    logger.info("sending request to {}".format(url))
+    res = requests.get(
+        f"https://i.instagram.com/api/v1/users/{id}/info/",
+        headers={
+            "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_3 like Mac OS X) AppleWebKit/603.3.8 (KHTML, like Gecko) Mobile/14G60 Instagram 12.0.0.16.90 (iPhone9,4; iOS 10_3_3; en_US; en-US; scale=2.61; gamut=wide; 1080x1920)"
+        },
+    )
+    if not res.ok:
+        logger.error(res.json())
+    logger.info("received result: {}".format(res.json()))
+    return res.json()["user"]["username"]
