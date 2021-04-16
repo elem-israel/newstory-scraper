@@ -20,16 +20,15 @@ def get_profile(user: str, destination: str, maximum=100):
         "media_types": ["none"],
         "maximum": maximum,
         "comments": False,  # TODO comments are not working https://github.com/arc298/instagram-scraper/issues/615
-        "no_check_certificate": True if proxy_url is not None else False,
-        "proxies": json.dumps({"http": proxy_url, "https": proxy_url})
-        if proxy_url is not None
-        else None,
+        "no_check_certificate": True if len(proxies) else False,
+        "proxies": json.dumps(proxies) if len(proxies) else None,
     }
     scraper = InstagramScraper(**kwargs)
     scraper.scrape()
     try:
-        with open(os.path.join(destination, f"{user}.json"), encoding="utf8") as fp:
-            return json.load(fp)
+        return json.load(
+            open(os.path.join(destination, f"{user or tag}.json"), encoding="utf8")
+        )
     except FileNotFoundError:
         raise ValueError("Failed to scrape profile not found. View logs for more info.")
 
