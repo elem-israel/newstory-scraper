@@ -37,7 +37,12 @@ def scrape_tag(tag, maximum=100) -> dict:
         )(posts["GraphImages"][i]["owner"]["id"])
     os.makedirs(os.path.dirname(path), exist_ok=True)
     json.dump(
-        {"created_at": datetime.utcnow().isoformat(), "tag": tag, "data": posts},
+        {
+            "created_at": datetime.utcnow().isoformat(),
+            "tag": tag,
+            "data": posts,
+            "type": "tag",
+        },
         open(path, "w"),
     )
     if config.getboolean("kafka", "enabled"):

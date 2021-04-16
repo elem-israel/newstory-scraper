@@ -23,7 +23,12 @@ def scrape_profile(user) -> dict:
     path = os.path.join(destination, "profile", user, "profile.json")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     json.dump(
-        {"created_at": datetime.utcnow().isoformat(), "data": profile}, open(path, "w")
+        {
+            "created_at": datetime.utcnow().isoformat(),
+            "data": profile,
+            "type": "profile",
+        },
+        open(path, "w"),
     )
     if config.getboolean("kafka", "enabled"):
         get_producer(bootstrap_servers).send(
