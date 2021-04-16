@@ -109,6 +109,19 @@ def extract_jsonpath(expression, dictionary):
     return [v.value for v in jsonpath_expr.find(dictionary)]
 
 
+def get_proxy():
+    if os.environ.get("PROXY_USER"):
+        super_proxy_url = "http://{}:{}@{}:{}".format(
+            os.environ["PROXY_USER"],
+            os.environ["PROXY_PASSWORD"],
+            os.environ["PROXY_HOST"],
+            os.environ["PROXY_PORT"],
+        )
+        return {"http": super_proxy_url, "https": super_proxy_url}
+    else:
+        return {}
+
+
 def get_username_by_id(id: Union[str, int]):
     url = f"https://i.instagram.com/api/v1/users/{id}/info/"
     logger.info("sending request to {}".format(url))

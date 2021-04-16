@@ -4,15 +4,13 @@ import os
 
 from instagram_scraper import InstagramScraper
 
+from newstory_scraper.util import get_proxy
+
 logger = logging.getLogger(__name__)
 
 
 def get_profile(user: str, destination: str, maximum=100):
-    if os.environ.get("PROXY_USER"):
-        logger.info("using proxy")
-        proxy_url = f"http://{os.environ['PROXY_USER']}:{os.environ['PROXY_PASSWORD']}@{os.environ['PROXY_HOST']}:{os.environ['PROXY_PORT']}"
-    else:
-        proxy_url = None
+    proxies = get_proxy()
     logger.info("running instagram scraper")
     kwargs = {
         "usernames": [user],
