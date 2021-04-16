@@ -36,8 +36,10 @@ def scrape_tag(tag, maximum=100) -> dict:
             wait=wait_fixed(5),
         )(posts["GraphImages"][i]["owner"]["id"])
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w") as fp:
-        json.dump({"created_at": datetime.utcnow().isoformat(), "data": posts}, fp)
+    json.dump(
+        {"created_at": datetime.utcnow().isoformat(), "tag": tag, "data": posts},
+        open(path, "w"),
+    )
     if config.getboolean("kafka", "enabled"):
         get_producer(config["kafka"]["bootstrap_servers"]).send(
             topic="newstory.tasks.upload", key=tag, value=path
