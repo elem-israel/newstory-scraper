@@ -1,11 +1,12 @@
 import logging
 import os
 from datetime import datetime
+from typing import List
 from typing import Union
 
 import jsonpath_ng
 import requests
-
+from azure.storage.blob import BlobServiceClient
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +67,7 @@ def extract_posts(dictionary):
     )
     posts = [
         {
+            "resource": "post",
             "created_date": datetime.fromisoformat(
                 extract_jsonpath("$.created_at", dictionary)[0]
             ),
@@ -76,7 +78,7 @@ def extract_posts(dictionary):
                 extract_jsonpath("$.edge_media_to_caption.edges..node.text", post)
             ),
             "likes_count": extract_jsonpath("$.edge_media_preview_like.count", post)[0],
-            "photos": extract_jsonpath("$.urls", post)[0],
+            "image": extract_jsonpath("$.display_url", post)[0],
         }
         for post in posts
     ]
@@ -89,6 +91,7 @@ def extract_tags(dictionary):
     )
     posts = [
         {
+            "type": "hashtag",
             "instagram_post_id": post["id"],
             "tags": get_from_list(extract_jsonpath("$.tags", post)),
         }
@@ -125,13 +128,50 @@ def get_proxy():
 def get_username_by_id(id: Union[str, int]):
     url = f"https://i.instagram.com/api/v1/users/{id}/info/"
     logger.info("sending request to {}".format(url))
+    proxies = get_proxy()
     res = requests.get(
         f"https://i.instagram.com/api/v1/users/{id}/info/",
         headers={
             "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_3 like Mac OS X) AppleWebKit/603.3.8 (KHTML, like Gecko) Mobile/14G60 Instagram 12.0.0.16.90 (iPhone9,4; iOS 10_3_3; en_US; en-US; scale=2.61; gamut=wide; 1080x1920)"
         },
+        proxies=proxies,
+        verify=False if len(proxies) else True,
     )
-    if not res.ok:
-        logger.error(res.json())
+    res.raise_for_status()
+    if b"login" in res.content:
+        raise ValueError("Login page hit!")
     logger.info("received result: {}".format(res.json()))
     return res.json()["user"]["username"]
+
+
+def upload_to_azure_storage(
+    connect_str, local, container_name, remote, overwrite=False
+):
+    # Create the BlobServiceClient object which will be used to create a container client
+    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+    # Create a blob client using the local file name as the name for the blob
+    blob_client = blob_service_client.get_blob_client(
+        container=container_name, blob=remote
+    )
+
+    print("\nUploading to Azure Storage as blob:\n\t" + local)
+
+    # Upload the created file
+    with open(local, "rb") as data:
+        blob_client.upload_blob(data, overwrite=overwrite)
+
+
+def flatten(list_of_lists: List[list]) -> list:
+    """
+    flatten a list of lists
+    [[a],[b]] -> [a,b]
+    :param list_of_lists:
+    :return: flat list
+    """
+    return [item for sublist in list_of_lists for item in sublist]
+
+
+def traverse_path(path):
+    for root, dirs, files in os.walk(path):
+        for filename in files:
+            yield os.path.join(root, filename)
